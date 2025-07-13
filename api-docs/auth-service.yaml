@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Auth Service API
+  description: API de autenticação e gerenciamento de usuários.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Ambiente local
+
+paths:
+  /register:
+    post:
+      tags: [Auth]
+      summary: Registro de novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+        '400':
+          description: Dados inválidos
+        '409':
+          description: Email já registrado
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Autenticação do usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login bem-sucedido, retorna token JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciais inválidas
+
+  /users:
+    get:
+      tags: [Users]
+      summary: Lista todos os usuários
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Busca um usuário por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado
+
+    put:
+      tags: [Users]
+      summary: Atualiza um usuário por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Usuário atualizado
+        '404':
+          description: Usuário não encontrado
+
+    delete:
+      tags: [Users]
+      summary: Deleta um usuário por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Usuário deletado com sucesso
+        '404':
+          description: Usuário não encontrado
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expires_in:
+          type: integer
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+          description: Data e hora de criação (ZonedDateTime)
