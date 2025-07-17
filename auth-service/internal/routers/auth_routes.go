@@ -1,18 +1,11 @@
 package routers
 
 import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 
 func AuthRegister(router *gin.Engine) {
-	router.POST("/login", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Login successful",
-		})
-	})
-	router.POST("/register", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Registration successful",
-		})
-	})
+	router.POST("/login", handlers.Login)
+	router.POST("/register", handlers.Register)
 }
