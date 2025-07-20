@@ -18,8 +18,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	message := authService.Login(loginReq)
-	c.JSON(http.StatusOK, message)
+	response := authService.Login(loginReq)
+	c.JSON(http.StatusOK, response)
 }
 
 func Register(c *gin.Context) {
@@ -31,6 +31,6 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	message := authService.RegisterUser(userRequest)
-	c.JSON(http.StatusCreated, message)
+	response := authService.RegisterUser(userRequest)
+	c.JSON(http.StatusCreated, response)
 }
