@@ -50,3 +50,7 @@ func Init() {
 	}
 	log.Println("✅ Database connection successful")
 }
+
+func GetDB() *gorm.DB {
+	return DB
+}

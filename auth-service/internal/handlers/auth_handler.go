@@ -8,29 +8,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var authService = service.NewAuthService()
+type AuthHandler struct {
+	authService service.AuthService
+}
 
-func Login(c *gin.Context) {
+func NewAuthHandler(authService service.AuthService) *AuthHandler {
+	return &AuthHandler{authService: authService}
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
 	var loginReq model.UserLoginRequest
-
 	if err := c.ShouldBindJSON(&loginReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response := authService.Login(loginReq)
+	response := h.authService.Login(&loginReq)
 	c.JSON(http.StatusOK, response)
 }
 
-func Register(c *gin.Context) {
+func (h *AuthHandler) Register(c *gin.Context) {
 	var userRequest model.RegisterUserRequest
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
-
-		// MAKE EROR TREATMENT
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response := authService.RegisterUser(userRequest)
+	response := h.authService.RegisterUser(&userRequest)
 	c.JSON(http.StatusCreated, response)
 }

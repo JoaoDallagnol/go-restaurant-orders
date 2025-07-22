@@ -5,19 +5,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	CreateUser(user *model.User) error
+	GetUserById(id uint) (*model.User, error)
+	GetAllUsers() ([]model.User, error)
+	DeleteUser(id uint) error
+}
+
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db: db}
 }
 
-func (r *UserRepository) CreateUser(user *model.User) error {
+func (r *userRepository) CreateUser(user *model.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
+func (r *userRepository) GetUserById(id uint) (*model.User, error) {
 	var user model.User
 	if err := r.db.First(&user, id).Error; err != nil {
 		return nil, err
@@ -26,7 +33,7 @@ func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) GetAllUsers() ([]model.User, error) {
+func (r *userRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
 	if err := r.db.Find(&users).Error; err != nil {
 		return nil, err
@@ -35,6 +42,6 @@ func (r *UserRepository) GetAllUsers() ([]model.User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) DeleteUser(id uint) error {
+func (r *userRepository) DeleteUser(id uint) error {
 	return r.db.Delete(&model.User{}, id).Error
 }

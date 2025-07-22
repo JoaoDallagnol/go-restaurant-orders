@@ -8,21 +8,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var userService = service.NewUserService()
+type UserHandler struct {
+	userService service.UserService
+}
 
-func GetAllUsers(c *gin.Context) {
-	response := userService.GetAllUser()
+func NewUserHandler(userService service.UserService) *UserHandler {
+	return &UserHandler{userService: userService}
+}
+
+func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	response := h.userService.GetAllUser()
 	c.JSON(http.StatusOK, response)
 }
 
-func GetUserById(c *gin.Context) {
+func (h *UserHandler) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-
-	response := userService.GetUserById(id)
+	response := h.userService.GetUserById(id)
 	c.JSON(http.StatusOK, response)
 }
 
-func UpdateUser(c *gin.Context) {
+func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var userReq model.RegisterUserRequest
 
@@ -31,13 +36,12 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	response := userService.UpdateUser(id, userReq)
+	response := h.userService.UpdateUser(id, &userReq)
 	c.JSON(http.StatusOK, response)
 }
 
-func DeleteUser(c *gin.Context) {
+func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-
-	response := userService.DeleteUser(id)
+	response := h.userService.DeleteUser(id)
 	c.JSON(http.StatusNoContent, response)
 }

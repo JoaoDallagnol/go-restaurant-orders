@@ -4,18 +4,26 @@ import (
 	"fmt"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
 )
 
-type AuthService struct{}
-
-func NewAuthService() *AuthService {
-	return &AuthService{}
+type AuthService interface {
+	RegisterUser(userReq *model.RegisterUserRequest) string
+	Login(loginReq *model.UserLoginRequest) string
 }
 
-func (s *AuthService) RegisterUser(userReq model.RegisterUserRequest) string {
+type authService struct {
+	userRepository repository.UserRepository
+}
+
+func NewAuthService(userRepository repository.UserRepository) AuthService {
+	return &authService{userRepository: userRepository}
+}
+
+func (s *authService) RegisterUser(userReq *model.RegisterUserRequest) string {
 	return fmt.Sprintf("Usuario %s registrado com sucesso!", userReq.Name)
 }
 
-func (s *AuthService) Login(loginReq model.UserLoginRequest) string {
+func (s *authService) Login(loginReq *model.UserLoginRequest) string {
 	return "Usuario Logado!"
 }
