@@ -18,3 +18,12 @@ func MapUserToUserResponse(user *model.User) model.UserResponse {
 		CreatedAt: user.CreatedAt.String(),
 	}
 }
+
+func MapUserListToUserResponseList(userList *[]model.User) []model.UserResponse {
+	response := make([]model.UserResponse, 0, len(*userList))
+
+	for _, user := range *userList {
+		response = append(response, MapUserToUserResponse(&user))
+	}
+	return response
+}
