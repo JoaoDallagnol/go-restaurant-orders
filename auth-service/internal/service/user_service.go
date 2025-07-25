@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
@@ -8,9 +10,9 @@ import (
 
 type UserService interface {
 	GetAllUser() []model.UserResponse
-	GetUserById(userId string) string
-	UpdateUser(userId string, userReq *model.RegisterUserRequest) string
-	DeleteUser(userId string) string
+	GetUserById(id string) model.UserResponse
+	UpdateUser(id string, userReq *model.RegisterUserRequest) string
+	DeleteUser(id string) string
 }
 
 type userService struct {
@@ -35,14 +37,25 @@ func (s *userService) GetAllUser() []model.UserResponse {
 	return mapper.MapUserListToUserResponseList(&userList)
 }
 
-func (s *userService) GetUserById(userId string) string {
-	return "Usuario by Id"
+func (s *userService) GetUserById(id string) model.UserResponse {
+	userId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		panic("Invalid Id: " + err.Error())
+	}
+
+	user, err := s.userRepository.GetUserById(uint(userId))
+
+	if err != nil {
+		panic("Failed to retrieve user: " + err.Error())
+	}
+
+	return mapper.MapUserToUserResponse(user)
 }
 
-func (s *userService) UpdateUser(userId string, userReq *model.RegisterUserRequest) string {
+func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) string {
 	return "Usuario atualizado"
 }
 
-func (s *userService) DeleteUser(userId string) string {
+func (s *userService) DeleteUser(id string) string {
 	return "Usuario deletado"
 }
