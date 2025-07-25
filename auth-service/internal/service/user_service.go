@@ -12,7 +12,7 @@ type UserService interface {
 	GetAllUser() []model.UserResponse
 	GetUserById(id string) model.UserResponse
 	UpdateUser(id string, userReq *model.RegisterUserRequest) string
-	DeleteUser(id string) string
+	DeleteUser(id string)
 }
 
 type userService struct {
@@ -56,6 +56,15 @@ func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) 
 	return "Usuario atualizado"
 }
 
-func (s *userService) DeleteUser(id string) string {
-	return "Usuario deletado"
+func (s *userService) DeleteUser(id string) {
+	userId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		panic("Invalid Id: " + err.Error())
+	}
+
+	deleteErr := s.userRepository.DeleteUser(uint(userId))
+
+	if deleteErr != nil {
+		panic("Error on delete user: " + err.Error())
+	}
 }

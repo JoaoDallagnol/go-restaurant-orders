@@ -42,6 +42,6 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	response := h.userService.DeleteUser(id)
-	c.JSON(http.StatusNoContent, response)
+	h.userService.DeleteUser(id)
+	c.JSON(http.StatusNoContent, model.User{})
 }
