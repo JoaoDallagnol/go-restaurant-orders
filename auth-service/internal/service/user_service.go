@@ -11,7 +11,7 @@ import (
 type UserService interface {
 	GetAllUser() []model.UserResponse
 	GetUserById(id string) model.UserResponse
-	UpdateUser(id string, userReq *model.RegisterUserRequest) string
+	UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse
 	DeleteUser(id string)
 }
 
@@ -52,8 +52,27 @@ func (s *userService) GetUserById(id string) model.UserResponse {
 	return mapper.MapUserToUserResponse(user)
 }
 
-func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) string {
-	return "Usuario atualizado"
+func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse {
+	userId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		panic("Invalid ID: " + err.Error())
+	}
+
+	existingUser, err := s.userRepository.GetUserById(uint(userId))
+	if err != nil {
+		panic("User not found: " + err.Error())
+	}
+
+	existingUser.Name = userReq.Name
+	existingUser.Email = userReq.Email
+	existingUser.Password = userReq.Password
+
+	updatedUser, err := s.userRepository.UpdateUser(existingUser)
+	if err != nil {
+		panic("Failed to update user: " + err.Error())
+	}
+
+	return mapper.MapUserToUserResponse(updatedUser)
 }
 
 func (s *userService) DeleteUser(id string) {
@@ -65,6 +84,6 @@ func (s *userService) DeleteUser(id string) {
 	deleteErr := s.userRepository.DeleteUser(uint(userId))
 
 	if deleteErr != nil {
-		panic("Error on delete user: " + err.Error())
+		panic("Error on delete user: " + deleteErr.Error())
 	}
 }
