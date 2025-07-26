@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
@@ -21,6 +24,12 @@ func NewAuthService(userRepository repository.UserRepository) AuthService {
 
 func (s *authService) RegisterUser(userReq *model.RegisterUserRequest) model.UserResponse {
 	user := mapper.MapCreateUserRequestToUser(userReq)
+	hashedPaswword, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if hashErr != nil {
+		fmt.Println("Error hashing password:", hashErr.Error())
+	}
+
+	user.Password = string(hashedPaswword)
 
 	createdUser, err := s.userRepository.CreateUser(&user)
 	if err != nil {

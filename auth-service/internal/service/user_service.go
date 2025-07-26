@@ -1,11 +1,13 @@
 package service
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -63,9 +65,14 @@ func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) 
 		panic("User not found: " + err.Error())
 	}
 
+	hashedPaswword, hashErr := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
+	if hashErr != nil {
+		fmt.Println("Error hashing password:", hashErr.Error())
+	}
+
 	existingUser.Name = userReq.Name
 	existingUser.Email = userReq.Email
-	existingUser.Password = userReq.Password
+	existingUser.Password = string(hashedPaswword)
 
 	updatedUser, err := s.userRepository.UpdateUser(existingUser)
 	if err != nil {
