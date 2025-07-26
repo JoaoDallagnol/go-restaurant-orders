@@ -88,7 +88,13 @@ func (s *userService) DeleteUser(id string) {
 		panic("Invalid Id: " + err.Error())
 	}
 
-	deleteErr := s.userRepository.DeleteUser(uint(userId))
+	userFound, errUser := s.userRepository.GetUserById(uint(userId))
+
+	if errUser != nil {
+		panic("Failed to retrieve user: " + errUser.Error())
+	}
+
+	deleteErr := s.userRepository.DeleteUser(userFound)
 
 	if deleteErr != nil {
 		panic("Error on delete user: " + deleteErr.Error())

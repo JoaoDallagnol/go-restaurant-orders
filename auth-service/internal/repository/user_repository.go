@@ -10,7 +10,7 @@ type UserRepository interface {
 	GetUserById(id uint) (*model.User, error)
 	GetAllUsers() ([]model.User, error)
 	UpdateUser(user *model.User) (*model.User, error)
-	DeleteUser(id uint) error
+	DeleteUser(user *model.User) error
 }
 
 type userRepository struct {
@@ -53,6 +53,6 @@ func (r *userRepository) UpdateUser(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) DeleteUser(id uint) error {
-	return r.db.Delete(&model.User{}, id).Error
+func (r *userRepository) DeleteUser(user *model.User) error {
+	return r.db.Delete(&user).Error
 }
