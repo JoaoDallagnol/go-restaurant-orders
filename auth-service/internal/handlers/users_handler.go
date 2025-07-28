@@ -27,12 +27,19 @@ func (h *UserHandler) GetUserById(c *gin.Context) {
 	response, err := h.userService.GetUserById(id)
 
 	if err != nil {
-		switch e := err.(type) {
-		case *errs.UserNotFoundError:
-			c.JSON(http.StatusNotFound, gin.H{"error": e.Error()})
-		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		if apiErr, ok := err.(errs.CodedError); ok {
+			status := errs.MapErrorCodeToStatus(apiErr.GetCode())
+			c.JSON(status, gin.H{
+				"error":   apiErr.GetCode(),
+				"details": apiErr.GetDetails(),
+			})
+			return
 		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
 		return
 	}
 	c.JSON(http.StatusOK, response)

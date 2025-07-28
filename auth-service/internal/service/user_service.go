@@ -45,7 +45,7 @@ func (s *userService) GetAllUser() []model.UserResponse {
 func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 	userId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		panic("Invalid Id: " + err.Error())
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	user, err := s.userRepository.GetUserById(uint(userId))
@@ -53,9 +53,9 @@ func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 	if err != nil {
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.UserResponse{}, &errs.UserNotFoundError{UserId: uint(userId)}
+			return model.UserResponse{}, errs.NewUserNotFound(uint(userId))
 		}
-		return model.UserResponse{}, fmt.Errorf("failed to retrieve user: %w", err)
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	return mapper.MapUserToUserResponse(user), nil
