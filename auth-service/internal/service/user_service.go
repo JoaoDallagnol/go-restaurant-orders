@@ -1,18 +1,21 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserService interface {
 	GetAllUser() []model.UserResponse
-	GetUserById(id string) model.UserResponse
+	GetUserById(id string) (model.UserResponse, error)
 	UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse
 	DeleteUser(id string)
 }
@@ -39,7 +42,7 @@ func (s *userService) GetAllUser() []model.UserResponse {
 	return mapper.MapUserListToUserResponseList(&userList)
 }
 
-func (s *userService) GetUserById(id string) model.UserResponse {
+func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 	userId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		panic("Invalid Id: " + err.Error())
@@ -48,10 +51,14 @@ func (s *userService) GetUserById(id string) model.UserResponse {
 	user, err := s.userRepository.GetUserById(uint(userId))
 
 	if err != nil {
-		panic("Failed to retrieve user: " + err.Error())
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.UserResponse{}, &errs.UserNotFoundError{UserId: uint(userId)}
+		}
+		return model.UserResponse{}, fmt.Errorf("failed to retrieve user: %w", err)
 	}
 
-	return mapper.MapUserToUserResponse(user)
+	return mapper.MapUserToUserResponse(user), nil
 }
 
 func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse {

@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/service"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,17 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 
 func (h *UserHandler) GetUserById(c *gin.Context) {
 	id := c.Param("id")
-	response := h.userService.GetUserById(id)
+	response, err := h.userService.GetUserById(id)
+
+	if err != nil {
+		switch e := err.(type) {
+		case *errs.UserNotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{"error": e.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		}
+		return
+	}
 	c.JSON(http.StatusOK, response)
 }
 
