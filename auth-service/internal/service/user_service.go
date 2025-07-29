@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
@@ -16,7 +15,7 @@ import (
 type UserService interface {
 	GetAllUser() ([]model.UserResponse, error)
 	GetUserById(id string) (model.UserResponse, error)
-	UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse
+	UpdateUser(id string, userReq *model.RegisterUserRequest) (model.UserResponse, error)
 	DeleteUser(id string)
 }
 
@@ -51,7 +50,6 @@ func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 	user, err := s.userRepository.GetUserById(uint(userId))
 
 	if err != nil {
-
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.UserResponse{}, errs.NewUserNotFound(uint(userId))
 		}
@@ -61,20 +59,23 @@ func (s *userService) GetUserById(id string) (model.UserResponse, error) {
 	return mapper.MapUserToUserResponse(user), nil
 }
 
-func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse {
+func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) (model.UserResponse, error) {
 	userId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		panic("Invalid ID: " + err.Error())
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	existingUser, err := s.userRepository.GetUserById(uint(userId))
 	if err != nil {
-		panic("User not found: " + err.Error())
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.UserResponse{}, errs.NewUserNotFound(uint(userId))
+		}
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	hashedPaswword, hashErr := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
 	if hashErr != nil {
-		fmt.Println("Error hashing password:", hashErr.Error())
+		return model.UserResponse{}, errs.NewInternalError(hashErr.Error())
 	}
 
 	existingUser.Name = userReq.Name
@@ -83,10 +84,10 @@ func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) 
 
 	updatedUser, err := s.userRepository.UpdateUser(existingUser)
 	if err != nil {
-		panic("Failed to update user: " + err.Error())
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
-	return mapper.MapUserToUserResponse(updatedUser)
+	return mapper.MapUserToUserResponse(updatedUser), nil
 }
 
 func (s *userService) DeleteUser(id string) {

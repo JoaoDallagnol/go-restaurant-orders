@@ -44,7 +44,6 @@ func (h *UserHandler) GetUserById(c *gin.Context) {
 			})
 			return
 		}
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
@@ -63,7 +62,21 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	response := h.userService.UpdateUser(id, &userReq)
+	response, err := h.userService.UpdateUser(id, &userReq)
+	if err != nil {
+		if apiErr, ok := err.(errs.CodedError); ok {
+			c.JSON(errs.MapErrorCodeToStatus(apiErr.GetCode()), gin.H{
+				"error":   apiErr.GetCode(),
+				"details": apiErr.GetDetails(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
+	}
+
 	c.JSON(http.StatusOK, response)
 }
 
