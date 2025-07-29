@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/service"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,20 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	response := h.authService.RegisterUser(&userRequest)
+	response, err := h.authService.RegisterUser(&userRequest)
+	if err != nil {
+		if apiErr, ok := err.(errs.CodedError); ok {
+			c.JSON(errs.MapErrorCodeToStatus(apiErr.GetCode()), gin.H{
+				"error":   apiErr.GetCode(),
+				"details": apiErr.GetDetails(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
+	}
+
 	c.JSON(http.StatusCreated, response)
 }

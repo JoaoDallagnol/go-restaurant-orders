@@ -1,8 +1,7 @@
 package service
 
 import (
-	"fmt"
-
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
@@ -10,7 +9,7 @@ import (
 )
 
 type AuthService interface {
-	RegisterUser(userReq *model.RegisterUserRequest) model.UserResponse
+	RegisterUser(userReq *model.RegisterUserRequest) (model.UserResponse, error)
 	Login(loginReq *model.UserLoginRequest) string
 }
 
@@ -22,21 +21,21 @@ func NewAuthService(userRepository repository.UserRepository) AuthService {
 	return &authService{userRepository: userRepository}
 }
 
-func (s *authService) RegisterUser(userReq *model.RegisterUserRequest) model.UserResponse {
+func (s *authService) RegisterUser(userReq *model.RegisterUserRequest) (model.UserResponse, error) {
 	user := mapper.MapCreateUserRequestToUser(userReq)
-	hashedPaswword, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if hashErr != nil {
-		fmt.Println("Error hashing password:", hashErr.Error())
+	hashedPaswword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	user.Password = string(hashedPaswword)
 
 	createdUser, err := s.userRepository.CreateUser(&user)
 	if err != nil {
-		panic("Falied to create user: " + err.Error())
+		return model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
-	return mapper.MapUserToUserResponse(createdUser)
+	return mapper.MapUserToUserResponse(createdUser), nil
 }
 
 func (s *authService) Login(loginReq *model.UserLoginRequest) string {
