@@ -14,7 +14,7 @@ import (
 )
 
 type UserService interface {
-	GetAllUser() []model.UserResponse
+	GetAllUser() ([]model.UserResponse, error)
 	GetUserById(id string) (model.UserResponse, error)
 	UpdateUser(id string, userReq *model.RegisterUserRequest) model.UserResponse
 	DeleteUser(id string)
@@ -28,18 +28,18 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 	return &userService{userRepository: userRepository}
 }
 
-func (s *userService) GetAllUser() []model.UserResponse {
+func (s *userService) GetAllUser() ([]model.UserResponse, error) {
 	userList, err := s.userRepository.GetAllUsers()
 
 	if err != nil {
-		panic("Falied to retrieve user list: " + err.Error())
+		return []model.UserResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	if len(userList) == 0 {
-		return []model.UserResponse{}
+		return []model.UserResponse{}, nil
 	}
 
-	return mapper.MapUserListToUserResponseList(&userList)
+	return mapper.MapUserListToUserResponseList(&userList), nil
 }
 
 func (s *userService) GetUserById(id string) (model.UserResponse, error) {

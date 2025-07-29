@@ -18,7 +18,16 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
-	response := h.userService.GetAllUser()
+	response, err := h.userService.GetAllUser()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, response)
 }
 
