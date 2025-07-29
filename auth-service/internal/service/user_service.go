@@ -16,7 +16,7 @@ type UserService interface {
 	GetAllUser() ([]model.UserResponse, error)
 	GetUserById(id string) (model.UserResponse, error)
 	UpdateUser(id string, userReq *model.RegisterUserRequest) (model.UserResponse, error)
-	DeleteUser(id string)
+	DeleteUser(id string) error
 }
 
 type userService struct {
@@ -90,21 +90,26 @@ func (s *userService) UpdateUser(id string, userReq *model.RegisterUserRequest) 
 	return mapper.MapUserToUserResponse(updatedUser), nil
 }
 
-func (s *userService) DeleteUser(id string) {
+func (s *userService) DeleteUser(id string) error {
 	userId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		panic("Invalid Id: " + err.Error())
+		return errs.NewInternalError(err.Error())
 	}
 
-	userFound, errUser := s.userRepository.GetUserById(uint(userId))
+	userFound, err := s.userRepository.GetUserById(uint(userId))
 
-	if errUser != nil {
-		panic("Failed to retrieve user: " + errUser.Error())
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errs.NewUserNotFound(uint(userId))
+		}
+		return errs.NewInternalError(err.Error())
 	}
 
-	deleteErr := s.userRepository.DeleteUser(userFound)
+	err = s.userRepository.DeleteUser(userFound)
 
-	if deleteErr != nil {
-		panic("Error on delete user: " + deleteErr.Error())
+	if err != nil {
+		return errs.NewInternalError(err.Error())
 	}
+
+	return nil
 }

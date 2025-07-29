@@ -82,6 +82,21 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	h.userService.DeleteUser(id)
+	err := h.userService.DeleteUser(id)
+
+	if err != nil {
+		if apiErr, ok := err.(errs.CodedError); ok {
+			c.JSON(errs.MapErrorCodeToStatus(apiErr.GetCode()), gin.H{
+				"error":   apiErr.GetCode(),
+				"details": apiErr.GetDetails(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
+	}
+
 	c.JSON(http.StatusNoContent, model.User{})
 }
