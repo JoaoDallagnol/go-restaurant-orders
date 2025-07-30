@@ -1,0 +1,16 @@
+# this is all as a study purpose
+server:
+  port: 8080
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "admin"
+  password: "admin123"
+  dbname: "postgres"
+  schema: "go_restaurant_orders_auth_service"
+  sslmode: "disable"
+
+auth:
+  secret: "4Ja67+nRUvEUg/fDpbnnVw="
+  expiration_minutes: 60

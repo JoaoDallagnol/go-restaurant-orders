@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/db"
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/config"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/handlers"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/routers"
@@ -10,6 +13,8 @@ import (
 )
 
 func main() {
+	config.LoadConfig()
+
 	// Initialize DB
 	db.Init()
 
@@ -24,5 +29,6 @@ func main() {
 	server := gin.Default()
 	routers.RegisterRoutes(server, authHandler, userHandler)
 
-	server.Run(":8080") // Start the server on port 8080
+	port := config.AppConfig.Server.Port
+	server.Run(fmt.Sprintf(":%d", port)) // Start the server on port 8080
 }

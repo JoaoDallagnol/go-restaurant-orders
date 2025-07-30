@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/config"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,13 +13,13 @@ import (
 var DB *gorm.DB
 
 func Init() {
-	// Define your custom schema
-	const schema = "go_restaurant_orders_auth_service"
+	cfg := config.AppConfig.Database
+	schema := cfg.Schema
 
 	// DSN with search_path pointing to your schema
 	dsn := fmt.Sprintf(
-		"host=localhost user=admin password=admin123 dbname=postgres port=5432 sslmode=disable search_path=%s",
-		schema,
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s search_path=%s",
+		cfg.Host, cfg.User, cfg.Password, cfg.DBName, cfg.Port, cfg.SSLMode, schema,
 	)
 
 	// Open the GORM connection
