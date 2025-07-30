@@ -40,3 +40,10 @@ func NewInternalError(details string) *ResponseError {
 		Details: details,
 	}
 }
+
+func NewAuthInvalidCredentials() *ResponseError {
+	return &ResponseError{
+		Code:    CodeAuthInvalidCreds,
+		Details: "Email or password are incorrect",
+	}
+}

@@ -24,7 +24,21 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	response := h.authService.Login(&loginReq)
+	response, err := h.authService.Login(&loginReq)
+	if err != nil {
+		if apiErr, ok := err.(errs.CodedError); ok {
+			c.JSON(errs.MapErrorCodeToStatus(apiErr.GetCode()), gin.H{
+				"error":   apiErr.GetCode(),
+				"details": apiErr.GetDetails(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   errs.CodeInternalError,
+			"details": err.Error(),
+		})
+	}
+
 	c.JSON(http.StatusOK, response)
 }
 

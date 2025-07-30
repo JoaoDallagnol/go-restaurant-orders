@@ -11,6 +11,7 @@ type UserRepository interface {
 	GetAllUsers() ([]model.User, error)
 	UpdateUser(user *model.User) (*model.User, error)
 	DeleteUser(user *model.User) error
+	GetUserByEmail(email string) (*model.User, error)
 }
 
 type userRepository struct {
@@ -55,4 +56,13 @@ func (r *userRepository) UpdateUser(user *model.User) (*model.User, error) {
 
 func (r *userRepository) DeleteUser(user *model.User) error {
 	return r.db.Delete(&user).Error
+}
+
+func (r *userRepository) GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
