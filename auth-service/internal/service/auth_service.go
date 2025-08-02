@@ -2,18 +2,21 @@ package service
 
 import (
 	"errors"
+	"time"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/config"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/auth-service/internal/repository"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type AuthService interface {
 	RegisterUser(userReq *model.RegisterUserRequest) (model.UserResponse, error)
-	Login(loginReq *model.UserLoginRequest) (string, error)
+	Login(loginReq *model.UserLoginRequest) (model.UserLoginResponse, error)
 }
 
 type authService struct {
@@ -41,15 +44,40 @@ func (s *authService) RegisterUser(userReq *model.RegisterUserRequest) (model.Us
 	return mapper.MapUserToUserResponse(createdUser), nil
 }
 
-func (s *authService) Login(loginReq *model.UserLoginRequest) (string, error) {
-
+func (s *authService) Login(loginReq *model.UserLoginRequest) (model.UserLoginResponse, error) {
 	user, err := s.userRepository.GetUserByEmail(loginReq.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "model.UserResponse{}", errs.NewAuthInvalidCredentials()
+			return model.UserLoginResponse{}, errs.NewAuthInvalidCredentials()
 		}
-		return "", errs.NewInternalError(err.Error())
+		return model.UserLoginResponse{}, errs.NewInternalError(err.Error())
 	}
 
-	return "%s, Usuario Logado!" + user.Email, nil
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginReq.Password)); err != nil {
+		return model.UserLoginResponse{}, errs.NewAuthInvalidCredentials()
+	}
+
+	expiration := time.Duration(config.AppConfig.Auth.ExpirationMinutes) * time.Minute
+	claims := jwt.MapClaims{
+		"sub":   user.ID,
+		"email": user.Email,
+		"exp":   time.Now().Add(expiration).Unix(),
+		"iat":   time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret := []byte(config.AppConfig.Auth.Secret)
+	signedToken, err := token.SignedString(secret)
+	if err != nil {
+		return model.UserLoginResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	return buildLoginResponse(signedToken, expiration.String()), nil
+}
+
+func buildLoginResponse(token, expiration string) model.UserLoginResponse {
+	return model.UserLoginResponse{
+		Token:     token,
+		ExpiresIn: expiration,
+	}
 }
