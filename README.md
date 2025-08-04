@@ -7,36 +7,28 @@
 The system is composed of the following microservices:
 
 - **Auth Service** – Handles authentication and user management
-- **User Service** – Manages user-related data
 - **Menu Service** – Manages menu items and categories
 - **Order Service** – Handles order creation and tracking
 - **Payment Service** – Manages payment processing and status
 
-#### 🔐 Auth Service
+### Auth Service 
+  The `auth-service` provides endpoints for user authentication and JWT-based access control.
 
-##### 📄 Description
+  - 📚 **API Endpoints** (following **OpenAPI 3.0.3**):
+    - `POST /register` – Register a new user  
+    - `POST /login` – Authenticate and receive a JWT  
+    - `GET /users` – List all users *(JWT protected)*  
+    - `GET /users/{id}` – Get user by ID *(JWT protected)*  
+    - `PUT /users/{id}` – Update user by ID *(JWT protected)*  
+    - `DELETE /users/{id}` – Delete user by ID *(JWT protected)*  
 
-The `auth-service` provides endpoints for user authentication and JWT-based access control.
-
-##### 📚 API Endpoints
-
-The API follows the **OpenAPI 3.0.3 (Swagger)** specification, with the following key endpoints:
-
-- `POST /register` – Register a new user  
-- `POST /login` – Authenticate and receive a JWT  
-- `GET /users` – List all users *(JWT protected)*  
-- `GET /users/{id}` – Get user by ID *(JWT protected)*  
-- `PUT /users/{id}` – Update user by ID *(JWT protected)*  
-- `DELETE /users/{id}` – Delete user by ID *(JWT protected)*  
-
-##### 🛠️ Technologies Used
-
-- **Go 1.24.4** – Core programming language  
-- **Gin** – Lightweight HTTP web framework  
-- **GORM** – ORM for database interaction  
-  - `gorm.io/gorm`  
-  - `gorm.io/driver/postgres`  
-- **JWT** – Authentication via [golang-jwt/jwt/v5](https://github.com/golang-jwt/jwt)  
-- **Swagger / OpenAPI 3.0** – API documentation and client generation  
-- **Viper** – Configuration management  
-- **Go Modules** – Dependency management
+  - 🛠️ **Technologies Used**:
+    - **Go 1.24.4** – Core programming language  
+    - **Gin** – Lightweight HTTP web framework  
+    - **GORM** – ORM for database interaction  
+      - `gorm.io/gorm`  
+      - `gorm.io/driver/postgres`  
+    - **JWT** – Authentication via [golang-jwt/jwt/v5](https://github.com/golang-jwt/jwt)  
+    - **Swagger / OpenAPI 3.0** – API documentation and client generation  
+    - **Viper** – Configuration management  
+    - **Go Modules** – Dependency management  
