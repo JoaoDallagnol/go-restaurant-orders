@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: Restaurant and Dish API
+  version: 1.0.0
+  description: API for managing restaurants and dishes
+
+servers:
+  - url: http://localhost:8080
+    description: Local environment
+
+paths:
+  /restaurants:
+    get:
+      tags: [Restaurants]
+      summary: Get all restaurants
+      responses:
+        '200':
+          description: A list of all restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+
+    post:
+      tags: [Restaurants]
+      summary: Create a new restaurant
+      requestBody:
+        description: Restaurant information to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantRequest'
+      responses:
+        '201':
+          description: Successfully created restaurant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Invalid request body
+
+  /restaurants/{id}:
+    get:
+      tags: [Restaurants]
+      summary: Get a restaurant by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the restaurant to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Restaurant not found
+
+    put:
+      tags: [Restaurants]
+      summary: Update a restaurant by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the restaurant to update
+          schema:
+            type: string
+      requestBody:
+        description: Updated restaurant data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantRequest'
+      responses:
+        '200':
+          description: Restaurant updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Restaurant not found
+
+    delete:
+      tags: [Restaurants]
+      summary: Delete a restaurant by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the restaurant to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Restaurant deleted successfully
+        '404':
+          description: Restaurant not found
+
+  /dishes:
+    get:
+      tags: [Dishes]
+      summary: Get all dishes
+      responses:
+        '200':
+          description: A list of all dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+
+    post:
+      tags: [Dishes]
+      summary: Create a new dish
+      requestBody:
+        description: Dish information to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DishRequest'
+      responses:
+        '201':
+          description: Successfully created dish
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '400':
+          description: Invalid request body
+
+  /dishes/{id}:
+    get:
+      tags: [Dishes]
+      summary: Get a dish by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the dish to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dish found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '404':
+          description: Dish not found
+
+    put:
+      tags: [Dishes]
+      summary: Update a dish by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the dish to update
+          schema:
+            type: string
+      requestBody:
+        description: Updated dish data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DishRequest'
+      responses:
+        '200':
+          description: Dish updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '404':
+          description: Dish not found
+
+    delete:
+      tags: [Dishes]
+      summary: Delete a dish by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the dish to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dish deleted successfully
+        '404':
+          description: Dish not found
+
+components:
+  schemas:
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    RestaurantRequest:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    Dish:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        price:
+          type: number
+          format: float
+        restaurantId:
+          type: string
+
+    DishRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - restaurantId
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        restaurantId:
+          type: string
