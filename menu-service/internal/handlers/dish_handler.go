@@ -24,7 +24,7 @@ func (h *DishHandler) CreateDish(c *gin.Context) {
 	c.JSON(http.StatusCreated, "Dish Ureated")
 }
 
-func (h *DishHandler) UpdateDIsh(c *gin.Context) {
+func (h *DishHandler) UpdateDish(c *gin.Context) {
 	c.JSON(http.StatusOK, "Dish Updated")
 }
 
