@@ -240,12 +240,12 @@ components:
           type: string
         description:
           type: string
+        price:
+          type: string
+          example: "12.50"
         createdAt:
           type: string
           format: date-time
-        price:
-          type: number
-          format: float
         restaurantId:
           type: string
 
@@ -262,7 +262,7 @@ components:
         description:
           type: string
         price:
-          type: number
-          format: float
+          type: string
+          example: "12.50"
         restaurantId:
           type: string
