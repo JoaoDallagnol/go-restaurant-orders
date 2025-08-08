@@ -3,13 +3,16 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type DishHandler struct{}
+type DishHandler struct {
+	dishService service.DishService
+}
 
-func NewDishHandler() *DishHandler {
-	return &DishHandler{}
+func NewDishHandler(dishService service.DishService) *DishHandler {
+	return &DishHandler{dishService: dishService}
 }
 
 func (h *DishHandler) GetAllDishes(c *gin.Context) {

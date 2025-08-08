@@ -3,13 +3,16 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type RestaurantHandler struct{}
+type RestaurantHandler struct {
+	restaurantService service.RestaurantService
+}
 
-func NewRestaurantHandler() *RestaurantHandler {
-	return &RestaurantHandler{}
+func NewRestaurantHandler(restaurantService service.RestaurantService) *RestaurantHandler {
+	return &RestaurantHandler{restaurantService: restaurantService}
 }
 
 func (h *RestaurantHandler) GetAllRestaurants(c *gin.Context) {
