@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/db"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/config"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/handlers"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/routers"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 	config.LoadConfig()
+	db.Init()
 
 	restaurantService := service.NewRestaurantService()
 	dishService := service.NewDishService()
