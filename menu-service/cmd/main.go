@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/config"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/handlers"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/routers"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/service"
@@ -8,6 +11,8 @@ import (
 )
 
 func main() {
+	config.LoadConfig()
+
 	restaurantService := service.NewRestaurantService()
 	dishService := service.NewDishService()
 
@@ -16,5 +21,7 @@ func main() {
 
 	server := gin.Default()
 	routers.RegisterRoutes(server, restauntHandler, dishHandler)
-	server.Run(":8080")
+
+	port := config.AppConfig.Server.Port
+	server.Run(fmt.Sprintf(":%d", port))
 }
