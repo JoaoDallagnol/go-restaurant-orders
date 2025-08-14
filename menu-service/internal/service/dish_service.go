@@ -1,6 +1,9 @@
 package service
 
-import "github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/model"
+import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/model"
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/repository"
+)
 
 type DishService interface {
 	GetAllDishes() ([]model.DishResponse, error)
@@ -10,10 +13,12 @@ type DishService interface {
 	DeleteDish(id string) error
 }
 
-type dishService struct{}
+type dishService struct {
+	dishRespository repository.DishRepository
+}
 
-func NewDishService() DishService {
-	return &dishService{}
+func NewDishService(dishRespository repository.DishRepository) DishService {
+	return &dishService{dishRespository: dishRespository}
 }
 
 func (d *dishService) GetAllDishes() ([]model.DishResponse, error) {
