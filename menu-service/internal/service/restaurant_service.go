@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/errs"
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/repository"
 )
@@ -22,7 +24,16 @@ func NewRestaurantService(restaurantRepository repository.RestaurantRepository) 
 }
 
 func (r *restaurantService) GetAllRestaurants() ([]model.RestaurantResponse, error) {
-	panic("unimplemented")
+	restaurantList, err := r.restaurantRepository.GetAllRestaurants()
+	if err != nil {
+		return []model.RestaurantResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	if len(restaurantList) == 0 {
+		return []model.RestaurantResponse{}, nil
+	}
+
+	return mapper.MapRestaurantListToRestaurantResponseList(&restaurantList), nil
 }
 
 func (r *restaurantService) GetRestaurantById(id string) (model.RestaurantResponse, error) {
