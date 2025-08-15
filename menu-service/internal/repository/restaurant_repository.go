@@ -23,19 +23,17 @@ func NewRestaurantRepository(db *gorm.DB) RestaurantRepository {
 
 func (r *restaurantRepository) GetAllRestaurants() ([]model.Restaurant, error) {
 	var restaurants []model.Restaurant
-	if err := r.db.Find(&restaurants).Error; err != nil {
+	if err := r.db.Preload("Dishes").Find(&restaurants).Error; err != nil {
 		return nil, err
 	}
-
 	return restaurants, nil
 }
 
 func (r *restaurantRepository) GetRestaurantById(id uint) (*model.Restaurant, error) {
 	var restaurant model.Restaurant
-	if err := r.db.First(&restaurant, id).Error; err != nil {
+	if err := r.db.Preload("Dishes").First(&restaurant, id).Error; err != nil {
 		return nil, err
 	}
-
 	return &restaurant, nil
 }
 

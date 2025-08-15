@@ -13,6 +13,10 @@ type Dish struct {
 	Price       decimal.Decimal `gorm:"not null"`
 	CreatedAt   time.Time       `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time       `gorm:"autoUpdateTime"`
+
+	// Foreign key
+	RestaurantID uint       `gorm:"not null;index"`
+	Restaurant   Restaurant `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type DishRequest struct {
@@ -22,9 +26,10 @@ type DishRequest struct {
 }
 
 type DishResponse struct {
-	ID          string `json:"id" binding:"required"`
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Price       string `json:"price" binding:"required"`
-	CreatedAt   string `json:"created_at"`
+	ID           uint   `json:"id" binding:"required"`
+	Name         string `json:"name" binding:"required"`
+	Description  string `json:"description" binding:"required"`
+	Price        string `json:"price" binding:"required"`
+	CreatedAt    string `json:"created_at"`
+	RestaurantID uint   `json:"restaurant_id,omitempty"`
 }

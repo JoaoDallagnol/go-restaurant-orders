@@ -8,6 +8,9 @@ type Restaurant struct {
 	Description string    `gorm:"not null"`
 	CreatedAt   time.Time `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
+
+	//1:N
+	Dishes []Dish `gorm:"foreignKey:RestaurantID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type RestaurantRequest struct {
@@ -16,8 +19,9 @@ type RestaurantRequest struct {
 }
 
 type RestaurantResponse struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"created_at"`
+	ID          uint           `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	CreatedAt   string         `json:"created_at"`
+	Dishes      []DishResponse `json:"dishes"`
 }
