@@ -32,3 +32,10 @@ func MapRestaurantListToRestaurantResponseList(restaurantList *[]model.Restauran
 
 	return response
 }
+
+func MapCreateRestaurantRequestToRestaurant(restReq *model.RestaurantRequest) model.Restaurant {
+	return model.Restaurant{
+		Name:        restReq.Name,
+		Description: restReq.Description,
+	}
+}
