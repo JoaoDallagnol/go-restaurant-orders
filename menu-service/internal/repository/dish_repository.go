@@ -7,7 +7,7 @@ import (
 
 type DishRepository interface {
 	GetAllDishes() ([]model.Dish, error)
-	GetDishById(id string) (*model.Dish, error)
+	GetDishById(id uint) (*model.Dish, error)
 	CreateDish(dish *model.Dish) (*model.Dish, error)
 	UpdateDish(dish *model.Dish) (*model.Dish, error)
 	DeleteDish(dish *model.Dish) error
@@ -30,7 +30,7 @@ func (d *dishRepository) GetAllDishes() ([]model.Dish, error) {
 	return dishies, nil
 }
 
-func (d *dishRepository) GetDishById(id string) (*model.Dish, error) {
+func (d *dishRepository) GetDishById(id uint) (*model.Dish, error) {
 	var dish model.Dish
 	if err := d.db.First(&dish, id).Error; err != nil {
 		return nil, err

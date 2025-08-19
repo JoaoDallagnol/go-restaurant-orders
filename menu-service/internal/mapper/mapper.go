@@ -39,3 +39,23 @@ func MapCreateRestaurantRequestToRestaurant(restReq *model.RestaurantRequest) mo
 		Description: restReq.Description,
 	}
 }
+
+func MapDishToDishResponse(dish *model.Dish) model.DishResponse {
+	return model.DishResponse{
+		ID:           dish.ID,
+		Name:         dish.Name,
+		Description:  dish.Description,
+		Price:        dish.Price.String(),
+		RestaurantID: dish.RestaurantID,
+		CreatedAt:    dish.CreatedAt.String(),
+	}
+}
+
+func MapDishListToDishResponseList(dishList *[]model.Dish) []model.DishResponse {
+	response := make([]model.DishResponse, 0, len(*dishList))
+
+	for _, dish := range *dishList {
+		response = append(response, MapDishToDishResponse(&dish))
+	}
+	return response
+}
