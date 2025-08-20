@@ -22,12 +22,12 @@ func NewDishRepository(db *gorm.DB) DishRepository {
 }
 
 func (d *dishRepository) GetAllDishes() ([]model.Dish, error) {
-	var dishies []model.Dish
-	if err := d.db.Find(&dishies).Error; err != nil {
+	var dishes []model.Dish
+	if err := d.db.Find(&dishes).Error; err != nil {
 		return nil, err
 	}
 
-	return dishies, nil
+	return dishes, nil
 }
 
 func (d *dishRepository) GetDishById(id uint) (*model.Dish, error) {
