@@ -76,10 +76,6 @@ func (d *dishService) CreateDish(dishRequest *model.DishRequest) (model.DishResp
 	}
 
 	dish := mapper.MapDishRequestToDish(dishRequest)
-	if err != nil {
-		return model.DishResponse{}, errs.NewInternalError(err.Error())
-	}
-
 	dish.RestaurantID = uint(restaurantId)
 
 	createdDish, err := d.dishRespository.CreateDish(&dish)
