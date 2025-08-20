@@ -16,16 +16,20 @@ type DishService interface {
 	GetAllDishes() ([]model.DishResponse, error)
 	GetDishById(id string) (model.DishResponse, error)
 	CreateDish(dishRequest *model.DishRequest) (model.DishResponse, error)
-	UpdateDish(id string, dishRequest *model.DishRequest) (model.DishResponse, error)
+	UpdateDish(id string, dishRequest *model.DishUpdateRequest) (model.DishResponse, error)
 	DeleteDish(id string) error
 }
 
 type dishService struct {
-	dishRespository repository.DishRepository
+	dishRespository      repository.DishRepository
+	restaurantRepository repository.RestaurantRepository
 }
 
-func NewDishService(dishRespository repository.DishRepository) DishService {
-	return &dishService{dishRespository: dishRespository}
+func NewDishService(dishRespository repository.DishRepository, restaurantRepository repository.RestaurantRepository) DishService {
+	return &dishService{
+		dishRespository:      dishRespository,
+		restaurantRepository: restaurantRepository,
+	}
 }
 
 func (d *dishService) GetAllDishes() ([]model.DishResponse, error) {
@@ -59,11 +63,34 @@ func (d *dishService) GetDishById(id string) (model.DishResponse, error) {
 }
 
 func (d *dishService) CreateDish(dishRequest *model.DishRequest) (model.DishResponse, error) {
-	//TODO IMPLEMENT 1:N LOGIC and pass Restaurant Id in the request
-	panic("unimplemented")
+	restaurantId, err := strconv.ParseUint(dishRequest.RestaurantId, 10, 32)
+	if err != nil {
+		return model.DishResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	if _, err := d.restaurantRepository.GetRestaurantById(uint(restaurantId)); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.DishResponse{}, errs.NewRestaurantNotFound(uint(restaurantId))
+		}
+		return model.DishResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	dish := mapper.MapDishRequestToDish(dishRequest)
+	if err != nil {
+		return model.DishResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	dish.RestaurantID = uint(restaurantId)
+
+	createdDish, err := d.dishRespository.CreateDish(&dish)
+	if err != nil {
+		return model.DishResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	return mapper.MapDishToDishResponse(createdDish), nil
 }
 
-func (d *dishService) UpdateDish(id string, dishRequest *model.DishRequest) (model.DishResponse, error) {
+func (d *dishService) UpdateDish(id string, dishRequest *model.DishUpdateRequest) (model.DishResponse, error) {
 	dishId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		return model.DishResponse{}, errs.NewInternalError(err.Error())

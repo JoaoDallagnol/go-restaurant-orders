@@ -20,7 +20,7 @@ func main() {
 	dishRepository := repository.NewDishRepository(db.DB)
 
 	restaurantService := service.NewRestaurantService(restaurantRepository)
-	dishService := service.NewDishService(dishRepository)
+	dishService := service.NewDishService(dishRepository, restaurantRepository)
 
 	restauntHandler := handlers.NewRestaurantHandler(restaurantService)
 	dishHandler := handlers.NewDishHandler(dishService)

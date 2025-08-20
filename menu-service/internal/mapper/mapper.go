@@ -1,6 +1,10 @@
 package mapper
 
-import "github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/model"
+import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/errs"
+	"github.com/JoaoDallagnol/go-restaurant-orders/menu-service/internal/model"
+	"github.com/shopspring/decimal"
+)
 
 func MapRestaurantToRestaurantResponse(restaurant *model.Restaurant) model.RestaurantResponse {
 	dishes := make([]model.DishResponse, 0, len(restaurant.Dishes))
@@ -58,4 +62,18 @@ func MapDishListToDishResponseList(dishList *[]model.Dish) []model.DishResponse 
 		response = append(response, MapDishToDishResponse(&dish))
 	}
 	return response
+}
+
+func MapDishRequestToDish(dish *model.DishRequest) model.Dish {
+
+	price, err := decimal.NewFromString(dish.Price)
+	if err != nil {
+		panic(errs.NewInternalError(err.Error()))
+	}
+
+	return model.Dish{
+		Name:        dish.Name,
+		Description: dish.Description,
+		Price:       price,
+	}
 }

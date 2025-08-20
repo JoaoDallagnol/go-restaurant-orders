@@ -20,6 +20,13 @@ type Dish struct {
 }
 
 type DishRequest struct {
+	Name         string `json:"name" binding:"required"`
+	Description  string `json:"description" binding:"required"`
+	Price        string `json:"price" binding:"required"`
+	RestaurantId string `json:"restaurantId" binding:"required"`
+}
+
+type DishUpdateRequest struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`
 	Price       string `json:"price" binding:"required"`

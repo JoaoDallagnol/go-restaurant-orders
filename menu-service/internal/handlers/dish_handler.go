@@ -52,7 +52,7 @@ func (h *DishHandler) CreateDish(c *gin.Context) {
 
 func (h *DishHandler) UpdateDish(c *gin.Context) {
 	id := c.Param("id")
-	var dishReq model.DishRequest
+	var dishReq model.DishUpdateRequest
 	if err := c.ShouldBindJSON(&dishReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
