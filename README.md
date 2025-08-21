@@ -32,3 +32,31 @@ The system is composed of the following microservices:
     - **Swagger / OpenAPI 3.0** – API documentation and client generation  
     - **Viper** – Configuration management  
     - **Go Modules** – Dependency management  
+
+### Menu Service
+  The `menu-service` manages restaurants and their dishes, ensuring a clean relationship between entities (1:N).  
+
+  - 📚 **API Endpoints** (following **OpenAPI 3.0.3**):
+    - **Restaurants**
+      - `POST /restaurants` – Create a new restaurant  
+      - `GET /restaurants` – List all restaurants *(with dishes)*  
+      - `GET /restaurants/{id}` – Get a restaurant by ID *(with dishes)*  
+      - `PUT /restaurants/{id}` – Update a restaurant by ID  
+      - `DELETE /restaurants/{id}` – Delete a restaurant by ID  
+    - **Dishes**
+      - `POST /dishes` – Create a new dish (linked to a restaurant)  
+      - `GET /dishes` – List all dishes  
+      - `GET /dishes/{id}` – Get a dish by ID *(with restaurant ID)*  
+      - `PUT /dishes/{id}` – Update a dish by ID  
+      - `DELETE /dishes/{id}` – Delete a dish by ID  
+
+  - 🛠️ **Technologies Used**:
+    - **Go 1.24.4** – Core programming language  
+    - **Gin** – Lightweight HTTP web framework  
+    - **GORM** – ORM for database interaction  
+      - `gorm.io/gorm`  
+      - `gorm.io/driver/postgres`  
+    - **Swagger / OpenAPI 3.0** – API documentation and client generation  
+    - **Viper** – Configuration management  
+    - **Go Modules** – Dependency management  
+    - **shopspring/decimal** – High-precision decimal for dish prices  
