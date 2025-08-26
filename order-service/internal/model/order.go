@@ -1,0 +1,21 @@
+package model
+
+import (
+	"time"
+
+	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/constants"
+	"github.com/shopspring/decimal"
+)
+
+type Order struct {
+	ID           uint                  `gorm:"primaryKey"`
+	ClientId     uint                  `gorm:"not null"`
+	RestaurantId uint                  `gorm:"not null"`
+	Total        decimal.Decimal       `gorm:"not null"`
+	Status       constants.OrderStatus `gorm:"not null"`
+	CreatedAt    time.Time             `gorm:"not null"`
+	UpdatedAt    time.Time             `gorm:"not null"`
+
+	//1:N
+	OrderItems []OrderItems `gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}

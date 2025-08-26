@@ -195,6 +195,10 @@ components:
         quantity:
           type: integer
           example: 2
+        price:
+          type: number
+          format: float
+          example: 12.50
         createdAt:
           type: string
           format: date-time
