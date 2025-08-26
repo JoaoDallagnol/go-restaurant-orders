@@ -19,3 +19,17 @@ type OrderItems struct {
 	OrderID uint  `gorm:"not null;index"`
 	Order   Order `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
+
+type OrderItemsRequest struct {
+	DishId   uint `json:"dishId" binding:"required"`
+	Quantity int  `json:"quantity" binding:"required"`
+}
+
+type OrderItemsResponse struct {
+	ID        uint            `json:"id"`
+	OrderId   uint            `json:"orderId"`
+	DishId    uint            `json:"dishId"`
+	Quantity  int             `json:"quantity"`
+	Price     decimal.Decimal `json:"price"`
+	CreatedAt string          `json:"created_at"`
+}

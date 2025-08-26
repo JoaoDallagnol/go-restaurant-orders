@@ -19,3 +19,19 @@ type Order struct {
 	//1:N
 	OrderItems []OrderItems `gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
+
+type OrderRequest struct {
+	ClientId     uint                `json:"clientId" binding:"required"`
+	RestaurantId uint                `json:"restaurantId" binding:"required"`
+	OrderItems   []OrderItemsRequest `json:"items" binding:"required"`
+}
+
+type OrderResponse struct {
+	ID           uint                  `json:"id"`
+	ClientId     uint                  `json:"clientId"`
+	RestaurantId uint                  `json:"restaurantId"`
+	Total        decimal.Decimal       `json:"total"`
+	Status       constants.OrderStatus `json:"status"`
+	CreatedAt    string                `json:"created_at"`
+	OrderItems   []OrderItemsResponse  `json:"items"`
+}
