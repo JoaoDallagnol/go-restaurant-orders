@@ -17,13 +17,13 @@ type Order struct {
 	UpdatedAt    time.Time             `gorm:"not null"`
 
 	//1:N
-	OrderItems []OrderItems `gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	OrderItems []OrderItem `gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type OrderRequest struct {
-	ClientId     uint                `json:"clientId" binding:"required"`
-	RestaurantId uint                `json:"restaurantId" binding:"required"`
-	OrderItems   []OrderItemsRequest `json:"items" binding:"required"`
+	ClientId     uint               `json:"clientId" binding:"required"`
+	RestaurantId uint               `json:"restaurantId" binding:"required"`
+	OrderItems   []OrderItemRequest `json:"items" binding:"required"`
 }
 
 type OrderResponse struct {
@@ -33,5 +33,5 @@ type OrderResponse struct {
 	Total        decimal.Decimal       `json:"total"`
 	Status       constants.OrderStatus `json:"status"`
 	CreatedAt    string                `json:"created_at"`
-	OrderItems   []OrderItemsResponse  `json:"items"`
+	OrderItems   []OrderItemResponse   `json:"items"`
 }

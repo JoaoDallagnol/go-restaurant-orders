@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/config"
 	"github.com/gin-gonic/gin"
 )
@@ -8,5 +10,7 @@ import (
 func main() {
 	config.LoadConfig()
 	server := gin.Default()
-	server.Run(":8082")
+
+	port := config.AppConfig.Server.Port
+	server.Run(fmt.Sprintf(":%d", port))
 }

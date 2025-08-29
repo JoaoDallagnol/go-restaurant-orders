@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type OrderItems struct {
+type OrderItem struct {
 	ID        uint            `gorm:"primaryKey"`
 	OrderId   uint            `gorm:"not null"`
 	DishId    uint            `gorm:"not null"`
@@ -20,12 +20,12 @@ type OrderItems struct {
 	Order   Order `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
-type OrderItemsRequest struct {
+type OrderItemRequest struct {
 	DishId   uint `json:"dishId" binding:"required"`
 	Quantity int  `json:"quantity" binding:"required"`
 }
 
-type OrderItemsResponse struct {
+type OrderItemResponse struct {
 	ID        uint            `json:"id"`
 	OrderId   uint            `json:"orderId"`
 	DishId    uint            `json:"dishId"`
