@@ -8,8 +8,7 @@ import (
 
 type OrderItem struct {
 	ID        uint            `gorm:"primaryKey"`
-	OrderId   uint            `gorm:"not null"`
-	DishId    uint            `gorm:"not null"`
+	DishID    uint            `gorm:"not null"`
 	Quantity  int             `gorm:"not null"`
 	Price     decimal.Decimal `gorm:"not null"`
 	CreatedAt time.Time       `gorm:"not null"`
@@ -21,14 +20,14 @@ type OrderItem struct {
 }
 
 type OrderItemRequest struct {
-	DishId   uint `json:"dishId" binding:"required"`
+	DishID   uint `json:"dishId" binding:"required"`
 	Quantity int  `json:"quantity" binding:"required"`
 }
 
 type OrderItemResponse struct {
 	ID        uint            `json:"id"`
-	OrderId   uint            `json:"orderId"`
-	DishId    uint            `json:"dishId"`
+	OrderID   uint            `json:"orderId"`
+	DishID    uint            `json:"dishId"`
 	Quantity  int             `json:"quantity"`
 	Price     decimal.Decimal `json:"price"`
 	CreatedAt string          `json:"created_at"`

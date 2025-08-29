@@ -9,8 +9,8 @@ import (
 
 type Order struct {
 	ID           uint                  `gorm:"primaryKey"`
-	ClientId     uint                  `gorm:"not null"`
-	RestaurantId uint                  `gorm:"not null"`
+	ClientID     uint                  `gorm:"not null"`
+	RestaurantID uint                  `gorm:"not null"`
 	Total        decimal.Decimal       `gorm:"not null"`
 	Status       constants.OrderStatus `gorm:"not null"`
 	CreatedAt    time.Time             `gorm:"not null"`
@@ -21,15 +21,15 @@ type Order struct {
 }
 
 type OrderRequest struct {
-	ClientId     uint               `json:"clientId" binding:"required"`
-	RestaurantId uint               `json:"restaurantId" binding:"required"`
+	ClientID     uint               `json:"clientId" binding:"required"`
+	RestaurantID uint               `json:"restaurantId" binding:"required"`
 	OrderItems   []OrderItemRequest `json:"items" binding:"required"`
 }
 
 type OrderResponse struct {
 	ID           uint                  `json:"id"`
-	ClientId     uint                  `json:"clientId"`
-	RestaurantId uint                  `json:"restaurantId"`
+	ClientID     uint                  `json:"clientId"`
+	RestaurantID uint                  `json:"restaurantId"`
 	Total        decimal.Decimal       `json:"total"`
 	Status       constants.OrderStatus `json:"status"`
 	CreatedAt    string                `json:"created_at"`
