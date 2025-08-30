@@ -20,3 +20,30 @@ func MapOrderItemListToOrderItemResponseList(orderItemList *[]model.OrderItem) [
 	}
 	return orderItemResponseList
 }
+
+func MapOrderToOrderResponse(order *model.Order) model.OrderResponse {
+
+	var orderItems []model.OrderItemResponse
+	if order.OrderItems != nil {
+		orderItems = MapOrderItemListToOrderItemResponseList(&order.OrderItems)
+	}
+
+	return model.OrderResponse{
+		ID:           order.ID,
+		ClientID:     order.ClientID,
+		RestaurantID: order.RestaurantID,
+		Total:        order.Total,
+		Status:       order.Status,
+		CreatedAt:    order.CreatedAt.String(),
+		OrderItems:   orderItems,
+	}
+}
+
+func MapOrderListToOrderResponseList(orderList *[]model.Order) []model.OrderResponse {
+	orderResponseList := make([]model.OrderResponse, len(*orderList))
+
+	for i, order := range *orderList {
+		orderResponseList[i] = MapOrderToOrderResponse(&order)
+	}
+	return orderResponseList
+}
