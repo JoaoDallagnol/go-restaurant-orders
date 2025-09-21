@@ -1,9 +1,11 @@
 package service
 
 import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/constants"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/repository"
+	"github.com/shopspring/decimal"
 )
 
 type OrderService interface {
@@ -41,7 +43,36 @@ func (o *orderService) GetOrderByID(id uint) (model.OrderResponse, error) {
 }
 
 func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderResponse, error) {
-	panic("unimplemented")
+	var orderItems []model.OrderItem
+	total := decimal.NewFromInt(0)
+
+	for _, itemReq := range order.OrderItems {
+		//TODO GET THE PRICE IN THE MENU-SERVICE
+		price := decimal.NewFromFloat(10.0)
+
+		orderItem := model.OrderItem{
+			DishID:   itemReq.DishID,
+			Quantity: itemReq.Quantity,
+			Price:    price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
+		}
+		total = total.Add(orderItem.Price)
+		orderItems = append(orderItems, orderItem)
+	}
+
+	newOrder := &model.Order{
+		ClientID:     order.ClientID,
+		RestaurantID: order.RestaurantID,
+		Total:        total,
+		Status:       constants.StatusPending,
+		OrderItems:   orderItems,
+	}
+
+	createdOrder, err := o.orderRepository.CreateOrder(newOrder)
+	if err != nil {
+		return model.OrderResponse{}, err
+	}
+
+	return mapper.MapOrderToOrderResponse(createdOrder), nil
 }
 
 func (o *orderService) DeleteOrder(id uint) error {
