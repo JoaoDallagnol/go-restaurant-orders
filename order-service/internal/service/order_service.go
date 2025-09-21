@@ -113,5 +113,5 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 }
 
 func (o *orderService) DeleteOrder(id uint) error {
-	panic("unimplemented")
+	return o.orderRepository.DeleteOrder(id)
 }
