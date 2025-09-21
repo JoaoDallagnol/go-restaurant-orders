@@ -12,7 +12,7 @@ type OrderService interface {
 	GetAllOrders() ([]model.OrderResponse, error)
 	GetOrderByID(id uint) (model.OrderResponse, error)
 	CreateOrder(order *model.OrderRequest) (model.OrderResponse, error)
-	UpdateOrder(id string, order *model.OrderRequest) (model.OrderResponse, error)
+	UpdateOrder(id uint, order *model.OrderRequest) (model.OrderResponse, error)
 	DeleteOrder(id uint) error
 }
 
@@ -75,10 +75,43 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 	return mapper.MapOrderToOrderResponse(createdOrder), nil
 }
 
-func (o *orderService) DeleteOrder(id uint) error {
-	panic("unimplemented")
+func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.OrderResponse, error) {
+	existingOrder, err := o.orderRepository.GetOrderByID(id)
+	if err != nil {
+		return model.OrderResponse{}, err
+	}
+
+	existingOrder.ClientID = order.ClientID
+	existingOrder.RestaurantID = order.RestaurantID
+
+	var updatedItems []model.OrderItem
+	total := decimal.NewFromInt(0)
+
+	for _, itemReq := range order.OrderItems {
+
+		//TODO GET THE PRICE IN THE MENU-SERVICE
+		price := decimal.NewFromFloat(10.0)
+
+		orderItem := model.OrderItem{
+			DishID:   itemReq.DishID,
+			Quantity: itemReq.Quantity,
+			Price:    price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
+			OrderID:  existingOrder.ID,
+		}
+		total = total.Add(orderItem.Price)
+		updatedItems = append(updatedItems, orderItem)
+	}
+
+	existingOrder.OrderItems = updatedItems
+	existingOrder.Total = total
+
+	if err := o.orderRepository.UpdateOrder(existingOrder); err != nil {
+		return model.OrderResponse{}, err
+	}
+
+	return mapper.MapOrderToOrderResponse(existingOrder), nil
 }
 
-func (o *orderService) UpdateOrder(id string, order *model.OrderRequest) (model.OrderResponse, error) {
+func (o *orderService) DeleteOrder(id uint) error {
 	panic("unimplemented")
 }
