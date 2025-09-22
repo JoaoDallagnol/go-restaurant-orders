@@ -9,3 +9,8 @@ database:
   dbname: "postgres"
   schema: "go_restaurant_orders_order_service"
   sslmode: "disable"
+menu_service:
+  connect_timout: 5
+  base_url: "http://localhost:8081"
+  endpoint:
+    get_dish_by_id: "/dishes/:id"

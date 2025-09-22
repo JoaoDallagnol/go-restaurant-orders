@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+
+	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/client"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/constants"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/model"
@@ -18,10 +21,14 @@ type OrderService interface {
 
 type orderService struct {
 	orderRepository repository.OrderRepository
+	menuClient      client.MenuClient
 }
 
-func NewOrderService(orderRepository repository.OrderRepository) OrderService {
-	return &orderService{orderRepository: orderRepository}
+func NewOrderService(orderRepository repository.OrderRepository, menuClient client.MenuClient) OrderService {
+	return &orderService{
+		orderRepository: orderRepository,
+		menuClient:      menuClient,
+	}
 }
 
 func (o *orderService) GetAllOrders() ([]model.OrderResponse, error) {
@@ -29,7 +36,6 @@ func (o *orderService) GetAllOrders() ([]model.OrderResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return mapper.MapOrderListToOrderResponseList(&orderList), nil
 }
 
@@ -38,7 +44,6 @@ func (o *orderService) GetOrderByID(id uint) (model.OrderResponse, error) {
 	if err != nil {
 		return model.OrderResponse{}, err
 	}
-
 	return mapper.MapOrderToOrderResponse(order), nil
 }
 
@@ -47,8 +52,15 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 	total := decimal.NewFromInt(0)
 
 	for _, itemReq := range order.OrderItems {
-		//TODO GET THE PRICE IN THE MENU-SERVICE
-		price := decimal.NewFromFloat(10.0)
+		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
+		if err != nil {
+			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
+		}
+
+		price, err := decimal.NewFromString(dish.Price)
+		if err != nil {
+			return model.OrderResponse{}, fmt.Errorf("invalid price format for dish %d: %v", itemReq.DishID, err)
+		}
 
 		orderItem := model.OrderItem{
 			DishID:   itemReq.DishID,
@@ -88,9 +100,15 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 	total := decimal.NewFromInt(0)
 
 	for _, itemReq := range order.OrderItems {
+		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
+		if err != nil {
+			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
+		}
 
-		//TODO GET THE PRICE IN THE MENU-SERVICE
-		price := decimal.NewFromFloat(10.0)
+		price, err := decimal.NewFromString(dish.Price)
+		if err != nil {
+			return model.OrderResponse{}, fmt.Errorf("invalid price format for dish %d: %v", itemReq.DishID, err)
+		}
 
 		orderItem := model.OrderItem{
 			DishID:   itemReq.DishID,
