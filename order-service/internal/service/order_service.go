@@ -1,14 +1,17 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/client"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/constants"
+	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/repository"
 	"github.com/shopspring/decimal"
+	"gorm.io/gorm"
 )
 
 type OrderService interface {
@@ -42,7 +45,10 @@ func (o *orderService) GetAllOrders() ([]model.OrderResponse, error) {
 func (o *orderService) GetOrderByID(id uint) (model.OrderResponse, error) {
 	order, err := o.orderRepository.GetOrderByID(id)
 	if err != nil {
-		return model.OrderResponse{}, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.OrderResponse{}, errs.NewOrderNotFound(id)
+		}
+		return model.OrderResponse{}, errs.NewInternalError(err.Error())
 	}
 	return mapper.MapOrderToOrderResponse(order), nil
 }
@@ -54,12 +60,13 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 	for _, itemReq := range order.OrderItems {
 		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
 		if err != nil {
+			//TODO MAKE A INTEGRATION ERROR
 			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
 		}
 
 		price, err := decimal.NewFromString(dish.Price)
 		if err != nil {
-			return model.OrderResponse{}, fmt.Errorf("invalid price format for dish %d: %v", itemReq.DishID, err)
+			return model.OrderResponse{}, errs.NewInternalError(err.Error())
 		}
 
 		orderItem := model.OrderItem{
@@ -81,7 +88,7 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 
 	createdOrder, err := o.orderRepository.CreateOrder(newOrder)
 	if err != nil {
-		return model.OrderResponse{}, err
+		return model.OrderResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	return mapper.MapOrderToOrderResponse(createdOrder), nil
@@ -90,7 +97,10 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.OrderResponse, error) {
 	existingOrder, err := o.orderRepository.GetOrderByID(id)
 	if err != nil {
-		return model.OrderResponse{}, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.OrderResponse{}, errs.NewOrderNotFound(id)
+		}
+		return model.OrderResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	existingOrder.ClientID = order.ClientID
@@ -102,12 +112,13 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 	for _, itemReq := range order.OrderItems {
 		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
 		if err != nil {
+			//TODO MAKE A INTEGRATION ERROR
 			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
 		}
 
 		price, err := decimal.NewFromString(dish.Price)
 		if err != nil {
-			return model.OrderResponse{}, fmt.Errorf("invalid price format for dish %d: %v", itemReq.DishID, err)
+			return model.OrderResponse{}, errs.NewInternalError(err.Error())
 		}
 
 		orderItem := model.OrderItem{
@@ -124,12 +135,17 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 	existingOrder.Total = total
 
 	if err := o.orderRepository.UpdateOrder(existingOrder); err != nil {
-		return model.OrderResponse{}, err
+		return model.OrderResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	return mapper.MapOrderToOrderResponse(existingOrder), nil
 }
 
 func (o *orderService) DeleteOrder(id uint) error {
-	return o.orderRepository.DeleteOrder(id)
+	err := o.orderRepository.DeleteOrder(id)
+	if err != nil {
+		return errs.NewInternalError(err.Error())
+	}
+
+	return nil
 }
