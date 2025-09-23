@@ -1,9 +1,13 @@
 package service
 
 import (
+	"errors"
+
+	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/repository"
+	"gorm.io/gorm"
 )
 
 type OrderItemService interface {
@@ -22,7 +26,7 @@ func NewOrderItemService(orderItemRepository repository.OrderItemRepository) Ord
 func (o *orderItemService) GetAllOrderItems() ([]model.OrderItemResponse, error) {
 	orderItemList, err := o.orderItemRepository.GetAllOrderItems()
 	if err != nil {
-		return nil, err
+		return nil, errs.NewInternalError(err.Error())
 	}
 
 	return mapper.MapOrderItemListToOrderItemResponseList(&orderItemList), nil
@@ -31,7 +35,10 @@ func (o *orderItemService) GetAllOrderItems() ([]model.OrderItemResponse, error)
 func (o *orderItemService) GetOrderItemByID(id uint) (model.OrderItemResponse, error) {
 	orderItem, err := o.orderItemRepository.GetOrderItemByID(id)
 	if err != nil {
-		return model.OrderItemResponse{}, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.OrderItemResponse{}, errs.NewOrderItemNotFound(id)
+		}
+		return model.OrderItemResponse{}, errs.NewInternalError(err.Error())
 	}
 
 	return mapper.MapOrderItemToOrderItemResponse(orderItem), nil
