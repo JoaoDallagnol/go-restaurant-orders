@@ -45,3 +45,10 @@ func NewInternalError(details string) *ResponseError {
 		Details: details,
 	}
 }
+
+func NewMenuServiceIntegrationError() *ResponseError {
+	return &ResponseError{
+		Code:    CodeMenuServiceIntegrationError,
+		Details: "Something went wrong when trying to communicate with menu-service",
+	}
+}

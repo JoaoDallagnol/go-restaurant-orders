@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/client"
 	"github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/constants"
@@ -60,8 +59,7 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 	for _, itemReq := range order.OrderItems {
 		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
 		if err != nil {
-			//TODO MAKE A INTEGRATION ERROR
-			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
+			return model.OrderResponse{}, errs.NewMenuServiceIntegrationError()
 		}
 
 		price, err := decimal.NewFromString(dish.Price)
@@ -112,8 +110,7 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 	for _, itemReq := range order.OrderItems {
 		dish, err := o.menuClient.GetDishByID(itemReq.DishID)
 		if err != nil {
-			//TODO MAKE A INTEGRATION ERROR
-			return model.OrderResponse{}, fmt.Errorf("failed to fetch dish %d: %v", itemReq.DishID, err)
+			return model.OrderResponse{}, errs.NewMenuServiceIntegrationError()
 		}
 
 		price, err := decimal.NewFromString(dish.Price)
