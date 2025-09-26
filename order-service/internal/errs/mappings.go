@@ -2,7 +2,7 @@ package errs
 
 import "net/http"
 
-func MapErroCodeToStatus(code ErrorCode) int {
+func MapErrorCodeToStatus(code ErrorCode) int {
 	switch code {
 	case CodeOrderNotFound:
 		return http.StatusNotFound
