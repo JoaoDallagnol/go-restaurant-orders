@@ -23,7 +23,7 @@ func NewOrderRepository(db *gorm.DB) OrderRepository {
 
 func (o *orderRepository) GetAllOrders() ([]model.Order, error) {
 	var orders []model.Order
-	if err := o.db.Preload("Items").Find(&orders).Error; err != nil {
+	if err := o.db.Preload("OrderItems").Find(&orders).Error; err != nil {
 		return nil, err
 	}
 	return orders, nil
@@ -31,7 +31,7 @@ func (o *orderRepository) GetAllOrders() ([]model.Order, error) {
 
 func (o *orderRepository) GetOrderByID(id uint) (*model.Order, error) {
 	var order model.Order
-	if err := o.db.Preload("Items").First(&order, id).Error; err != nil {
+	if err := o.db.Preload("OrderItems").First(&order, id).Error; err != nil {
 		return nil, err
 	}
 	return &order, nil
