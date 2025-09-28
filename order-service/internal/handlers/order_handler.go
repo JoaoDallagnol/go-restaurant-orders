@@ -25,6 +25,7 @@ func (h *OrderHandler) GetAllOrders(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -38,6 +39,7 @@ func (h *OrderHandler) GetOrderByID(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	response, err := h.orderService.GetOrderByID(uint(orderId))
@@ -80,6 +82,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusCreated, response)
@@ -93,6 +96,7 @@ func (h *OrderHandler) UpdateOrder(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	var orderReq model.OrderRequest
@@ -114,6 +118,7 @@ func (h *OrderHandler) UpdateOrder(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -127,6 +132,7 @@ func (h *OrderHandler) DeleteOrder(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	err = h.orderService.DeleteOrder(uint(orderId))
@@ -142,6 +148,7 @@ func (h *OrderHandler) DeleteOrder(c *gin.Context) {
 			"error":   errs.CodeInternalError,
 			"details": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusNoContent, model.OrderResponse{})
