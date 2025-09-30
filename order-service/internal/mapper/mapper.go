@@ -4,11 +4,13 @@ import "github.com/JoaoDallagnol/go-restaurant-orders/order-service/internal/mod
 
 func MapOrderItemToOrderItemResponse(orderItem *model.OrderItem) model.OrderItemResponse {
 	return model.OrderItemResponse{
-		ID:        orderItem.ID,
-		OrderID:   orderItem.OrderID,
-		DishID:    orderItem.DishID,
-		Quantity:  orderItem.Quantity,
-		CreatedAt: orderItem.CreatedAt.String(),
+		ID:           orderItem.ID,
+		OrderID:      orderItem.OrderID,
+		DishID:       orderItem.DishID,
+		RestaurantID: orderItem.RestaurantID,
+		Price:        orderItem.Price,
+		Quantity:     orderItem.Quantity,
+		CreatedAt:    orderItem.CreatedAt.String(),
 	}
 }
 
@@ -29,13 +31,12 @@ func MapOrderToOrderResponse(order *model.Order) model.OrderResponse {
 	}
 
 	return model.OrderResponse{
-		ID:           order.ID,
-		ClientID:     order.ClientID,
-		RestaurantID: order.RestaurantID,
-		Total:        order.Total,
-		Status:       order.Status,
-		CreatedAt:    order.CreatedAt.String(),
-		OrderItems:   orderItems,
+		ID:         order.ID,
+		ClientID:   order.ClientID,
+		Total:      order.Total,
+		Status:     order.Status,
+		CreatedAt:  order.CreatedAt.String(),
+		OrderItems: orderItems,
 	}
 }
 

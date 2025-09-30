@@ -7,12 +7,13 @@ import (
 )
 
 type OrderItem struct {
-	ID        uint            `gorm:"primaryKey"`
-	DishID    uint            `gorm:"not null"`
-	Quantity  int             `gorm:"not null"`
-	Price     decimal.Decimal `gorm:"not null"`
-	CreatedAt time.Time       `gorm:"not null"`
-	UpdatedAt time.Time       `gorm:"not null"`
+	ID           uint            `gorm:"primaryKey"`
+	DishID       uint            `gorm:"not null"`
+	RestaurantID uint            `gorm:"not null"`
+	Quantity     int             `gorm:"not null"`
+	Price        decimal.Decimal `gorm:"not null"`
+	CreatedAt    time.Time       `gorm:"not null"`
+	UpdatedAt    time.Time       `gorm:"not null"`
 
 	// Foreign key
 	OrderID uint  `gorm:"not null;index"`
@@ -25,10 +26,11 @@ type OrderItemRequest struct {
 }
 
 type OrderItemResponse struct {
-	ID        uint            `json:"id"`
-	OrderID   uint            `json:"orderId"`
-	DishID    uint            `json:"dishId"`
-	Quantity  int             `json:"quantity"`
-	Price     decimal.Decimal `json:"price"`
-	CreatedAt string          `json:"created_at"`
+	ID           uint            `json:"id"`
+	OrderID      uint            `json:"orderId"`
+	DishID       uint            `json:"dishId"`
+	RestaurantID uint            `json:"restaurantId"`
+	Quantity     int             `json:"quantity"`
+	Price        decimal.Decimal `json:"price"`
+	CreatedAt    string          `json:"created_at"`
 }

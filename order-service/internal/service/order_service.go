@@ -68,20 +68,20 @@ func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderRespon
 		}
 
 		orderItem := model.OrderItem{
-			DishID:   itemReq.DishID,
-			Quantity: itemReq.Quantity,
-			Price:    price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
+			DishID:       itemReq.DishID,
+			RestaurantID: dish.RestaurantID,
+			Quantity:     itemReq.Quantity,
+			Price:        price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
 		}
 		total = total.Add(orderItem.Price)
 		orderItems = append(orderItems, orderItem)
 	}
 
 	newOrder := &model.Order{
-		ClientID:     order.ClientID,
-		RestaurantID: order.RestaurantID,
-		Total:        total,
-		Status:       constants.StatusPending,
-		OrderItems:   orderItems,
+		ClientID:   order.ClientID,
+		Total:      total,
+		Status:     constants.StatusPending,
+		OrderItems: orderItems,
 	}
 
 	createdOrder, err := o.orderRepository.CreateOrder(newOrder)
@@ -102,7 +102,6 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 	}
 
 	existingOrder.ClientID = order.ClientID
-	existingOrder.RestaurantID = order.RestaurantID
 
 	var updatedItems []model.OrderItem
 	total := decimal.NewFromInt(0)
@@ -119,10 +118,11 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 		}
 
 		orderItem := model.OrderItem{
-			DishID:   itemReq.DishID,
-			Quantity: itemReq.Quantity,
-			Price:    price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
-			OrderID:  existingOrder.ID,
+			DishID:       itemReq.DishID,
+			RestaurantID: dish.RestaurantID,
+			Quantity:     itemReq.Quantity,
+			Price:        price.Mul(decimal.NewFromInt(int64(itemReq.Quantity))),
+			OrderID:      existingOrder.ID,
 		}
 		total = total.Add(orderItem.Price)
 		updatedItems = append(updatedItems, orderItem)
