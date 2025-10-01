@@ -112,6 +112,11 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 		return model.OrderResponse{}, errs.NewInternalError(err.Error())
 	}
 
+	_, err = o.authClient.GetUserById(order.ClientID)
+	if err != nil {
+		return model.OrderResponse{}, errs.NewAuthServiceIntegrationError()
+	}
+
 	existingOrder.ClientID = order.ClientID
 
 	var updatedItems []model.OrderItem
