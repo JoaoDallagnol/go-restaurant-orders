@@ -24,12 +24,18 @@ type OrderService interface {
 type orderService struct {
 	orderRepository repository.OrderRepository
 	menuClient      client.MenuClient
+	authClient      client.AuthClient
 }
 
-func NewOrderService(orderRepository repository.OrderRepository, menuClient client.MenuClient) OrderService {
+func NewOrderService(
+	orderRepository repository.OrderRepository,
+	menuClient client.MenuClient,
+	authClient client.AuthClient,
+) OrderService {
 	return &orderService{
 		orderRepository: orderRepository,
 		menuClient:      menuClient,
+		authClient:      authClient,
 	}
 }
 
@@ -55,6 +61,11 @@ func (o *orderService) GetOrderByID(id uint) (model.OrderResponse, error) {
 func (o *orderService) CreateOrder(order *model.OrderRequest) (model.OrderResponse, error) {
 	var orderItems []model.OrderItem
 	total := decimal.NewFromInt(0)
+
+	_, err := o.authClient.GetUserById(order.ClientID)
+	if err != nil {
+		return model.OrderResponse{}, errs.NewAuthServiceIntegrationError()
+	}
 
 	for _, itemReq := range order.OrderItems {
 		dish, err := o.menuClient.GetDishByID(itemReq.DishID)

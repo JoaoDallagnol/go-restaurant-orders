@@ -29,6 +29,14 @@ type Config struct {
 			GetDishByID string `mapstructure:"get_dish_by_id"`
 		} `mapstructure:"endpoint"`
 	} `mapstructure:"menu_service"`
+
+	AuthService struct {
+		ConnectTimeout int    `mapstructure:"connect_timeout"`
+		BaseURL        string `mapstructure:"base_url"`
+		Endpoint       struct {
+			GetUserById string `mapstructure:"get_user_by_id"`
+		} `mapstructure:"endpoint"`
+	} `mapstructure:"auth_service"`
 }
 
 var AppConfig *Config

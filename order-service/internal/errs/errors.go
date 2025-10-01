@@ -52,3 +52,9 @@ func NewMenuServiceIntegrationError() *ResponseError {
 		Details: "Something went wrong when trying to communicate with menu-service",
 	}
 }
+func NewAuthServiceIntegrationError() *ResponseError {
+	return &ResponseError{
+		Code:    CodeAuthServiceIntegrationError,
+		Details: "Something went wrong when trying to communicate with auth-service",
+	}
+}

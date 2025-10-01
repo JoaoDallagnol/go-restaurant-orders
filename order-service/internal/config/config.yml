@@ -10,7 +10,12 @@ database:
   schema: "go_restaurant_orders_order_service"
   sslmode: "disable"
 menu_service:
-  connect_timout: 5
+  connect_timeout: 5
   base_url: "http://localhost:8081"
   endpoint:
     get_dish_by_id: "/dishes/:id"
+auth_service:
+  connect_timeout: 5
+  base_url: "http://localhost:8080"
+  endpoint:
+    get_user_by_id: "/users/:id"

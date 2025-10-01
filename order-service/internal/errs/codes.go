@@ -7,4 +7,5 @@ const (
 	CodeOrderItemNotFound           ErrorCode = "ORDER_ITEM_NOT_FOUND"
 	CodeInternalError               ErrorCode = "INTERNAL_ERROR"
 	CodeMenuServiceIntegrationError ErrorCode = "MENU_SERVICE_INTEGRATION_ERROR"
+	CodeAuthServiceIntegrationError ErrorCode = "AUTH_SERVICE_INTEGRATION_ERROR"
 )

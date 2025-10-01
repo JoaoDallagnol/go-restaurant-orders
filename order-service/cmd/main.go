@@ -18,11 +18,12 @@ func main() {
 	db.Init()
 
 	menuClient := client.NewMenuClient(config.AppConfig)
+	authClient := client.NewAuthClient(config.AppConfig)
 
 	orderRespository := repository.NewOrderRepository(db.DB)
 	orderItemRepository := repository.NewOrderItemRepository(db.DB)
 
-	orderService := service.NewOrderService(orderRespository, menuClient)
+	orderService := service.NewOrderService(orderRespository, menuClient, authClient)
 	orderItemService := service.NewOrderItemService(orderItemRepository)
 
 	orderHandler := handlers.NewOrderHandler(orderService)

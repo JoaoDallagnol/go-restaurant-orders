@@ -10,6 +10,8 @@ func MapErrorCodeToStatus(code ErrorCode) int {
 		return http.StatusNotFound
 	case CodeMenuServiceIntegrationError:
 		return http.StatusInternalServerError
+	case CodeAuthServiceIntegrationError:
+		return http.StatusInternalServerError
 	default:
 		return http.StatusInternalServerError
 	}
