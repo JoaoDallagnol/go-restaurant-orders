@@ -23,7 +23,7 @@ func main() {
 	orderRespository := repository.NewOrderRepository(db.DB)
 	orderItemRepository := repository.NewOrderItemRepository(db.DB)
 
-	orderService := service.NewOrderService(orderRespository, menuClient, authClient)
+	orderService := service.NewOrderService(orderRespository, orderItemRepository, menuClient, authClient)
 	orderItemService := service.NewOrderItemService(orderItemRepository)
 
 	orderHandler := handlers.NewOrderHandler(orderService)

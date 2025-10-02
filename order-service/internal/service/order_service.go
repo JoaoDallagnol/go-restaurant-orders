@@ -22,20 +22,23 @@ type OrderService interface {
 }
 
 type orderService struct {
-	orderRepository repository.OrderRepository
-	menuClient      client.MenuClient
-	authClient      client.AuthClient
+	orderRepository      repository.OrderRepository
+	orderItemRespository repository.OrderItemRepository
+	menuClient           client.MenuClient
+	authClient           client.AuthClient
 }
 
 func NewOrderService(
 	orderRepository repository.OrderRepository,
+	orderItemRespository repository.OrderItemRepository,
 	menuClient client.MenuClient,
 	authClient client.AuthClient,
 ) OrderService {
 	return &orderService{
-		orderRepository: orderRepository,
-		menuClient:      menuClient,
-		authClient:      authClient,
+		orderRepository:      orderRepository,
+		orderItemRespository: orderItemRespository,
+		menuClient:           menuClient,
+		authClient:           authClient,
 	}
 }
 
@@ -142,6 +145,13 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 		}
 		total = total.Add(orderItem.Price)
 		updatedItems = append(updatedItems, orderItem)
+	}
+
+	for _, existingOrderItem := range existingOrder.OrderItems {
+		err = o.orderItemRespository.DeleteOrderItemsByOrderID(&existingOrderItem)
+		if err != nil {
+			return model.OrderResponse{}, errs.NewInternalError(err.Error())
+		}
 	}
 
 	existingOrder.OrderItems = updatedItems

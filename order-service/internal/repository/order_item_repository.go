@@ -8,6 +8,7 @@ import (
 type OrderItemRepository interface {
 	GetAllOrderItems() ([]model.OrderItem, error)
 	GetOrderItemByID(id uint) (*model.OrderItem, error)
+	DeleteOrderItemsByOrderID(ordemItem *model.OrderItem) error
 }
 
 type orderItemRepository struct {
@@ -32,4 +33,8 @@ func (o *orderItemRepository) GetOrderItemByID(id uint) (*model.OrderItem, error
 		return nil, err
 	}
 	return &orderItem, nil
+}
+
+func (o *orderItemRepository) DeleteOrderItemsByOrderID(orderItem *model.OrderItem) error {
+	return o.db.Delete(&orderItem).Error
 }
