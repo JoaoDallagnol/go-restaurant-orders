@@ -60,3 +60,28 @@ The system is composed of the following microservices:
     - **Viper** – Configuration management  
     - **Go Modules** – Dependency management  
     - **shopspring/decimal** – High-precision decimal for dish prices  
+
+### Order Service
+  The `order-service` handles the creation, management, and tracking of customer orders, integrating user and menu data to manage the entire order lifecycle.
+
+  - 📚 **API Endpoints** (following **OpenAPI 3.0.3**):
+    - **Orders**
+      - `POST /orders` – Create a new order  
+      - `GET /orders` – List all orders  
+      - `GET /orders/{id}` – Get order by ID  
+      - `PUT /orders/{id}` – Update an existing order  
+      - `DELETE /orders/{id}` – Delete an order  
+    - **OrderItems**
+      - `GET /order-items` – List all order items  
+      - `GET /order-items/{id}` – Get order item by ID
+
+  - 🛠️ **Technologies Used**:
+    - **Go 1.24.6** – Core programming language  
+    - **Gin** – Lightweight HTTP web framework  
+    - **GORM** – ORM for database interaction  
+      - `gorm.io/gorm`  
+      - `gorm.io/driver/postgres`  
+    - **Swagger / OpenAPI 3.0** – API documentation and client generation  
+    - **Viper** – Configuration management  
+    - **Go Modules** – Dependency management  
+    - **shopspring/decimal** – High-precision decimal for monetary values  
