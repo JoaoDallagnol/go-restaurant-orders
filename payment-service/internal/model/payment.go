@@ -16,9 +16,9 @@ type PaymentRequest struct {
 }
 
 type PaymentResponse struct {
-	ID        uint      `json:"id"`
-	OrderID   uint      `json:"orderId"`
-	Amount    string    `json:"amount"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        uint   `json:"id"`
+	OrderID   uint   `json:"orderId"`
+	Amount    string `json:"amount"`
+	Status    string `json:"status"`
+	CreatedAt string `json:"createdAt"`
 }
