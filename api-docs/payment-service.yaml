@@ -1,0 +1,161 @@
+openapi: 3.0.3
+info:
+  title: Payment Service API
+  version: 1.0.0
+  description: API for managing payments related to orders
+
+servers:
+  - url: http://localhost:8083
+    description: Local environment
+
+paths:
+  /payments:
+    get:
+      tags: [Payments]
+      summary: Get all payments
+      responses:
+        '200':
+          description: A list of all payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+    post:
+      tags: [Payments]
+      summary: Create a new payment for an order
+      requestBody:
+        description: Payment information to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid request body
+
+  /payments/{id}:
+    get:
+      tags: [Payments]
+      summary: Get a payment by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the payment to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Payment not found
+
+    put:
+      tags: [Payments]
+      summary: Update the status of a payment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the payment to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated payment status
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentUpdateRequest'
+      responses:
+        '200':
+          description: Payment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Payment not found
+
+    delete:
+      tags: [Payments]
+      summary: Delete a payment by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the payment to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Payment deleted successfully
+        '404':
+          description: Payment not found
+
+components:
+  schemas:
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: integer
+          description: ID of the related order
+        amount:
+          type: string
+          example: "37.50"
+        status:
+          type: string
+          enum: [PENDING, APPROVED, DECLINED, REFUNDED]
+        createdAt:
+          type: string
+          format: date-time
+      example:
+        id: 10
+        orderId: 1
+        amount: "37.50"
+        status: "PENDING"
+        createdAt: "2025-09-30T10:20:00Z"
+
+    PaymentRequest:
+      type: object
+      required:
+        - orderId
+        - amount
+      properties:
+        orderId:
+          type: integer
+          minimum: 1
+        amount:
+          type: string
+          example: "37.50"
+      example:
+        orderId: 1
+        amount: "37.50"
+
+    PaymentUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [PENDING, APPROVED, DECLINED, REFUNDED]
+      example:
+        status: "APPROVED"

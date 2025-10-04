@@ -153,7 +153,7 @@ components:
           type: integer
         status:
           type: string
-          enum: [PENDING, CONFIRMED, DELIVERED, CANCELLED]
+          enum: [PENDING, CONFIRMED, CANCELLED]
         total:
           type: string
           example: "37.50"
