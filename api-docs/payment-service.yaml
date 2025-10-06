@@ -64,33 +64,6 @@ paths:
         '404':
           description: Payment not found
 
-    put:
-      tags: [Payments]
-      summary: Update the status of a payment
-      parameters:
-        - in: path
-          name: id
-          required: true
-          description: The ID of the payment to update
-          schema:
-            type: integer
-      requestBody:
-        description: Updated payment status
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PaymentUpdateRequest'
-      responses:
-        '200':
-          description: Payment updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Payment'
-        '404':
-          description: Payment not found
-
     delete:
       tags: [Payments]
       summary: Delete a payment by ID
@@ -148,14 +121,3 @@ components:
       example:
         orderId: 1
         amount: "37.50"
-
-    PaymentUpdateRequest:
-      type: object
-      required:
-        - status
-      properties:
-        status:
-          type: string
-          enum: [PENDING, APPROVED, DECLINED, REFUNDED]
-      example:
-        status: "APPROVED"
