@@ -1,0 +1,16 @@
+server:
+  port: 8083
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "admin"
+  password: "admin123"
+  dbname: "postgres"
+  schema: "go_restaurant_orders_payment_service"
+  sslmode: "disable"
+order_service:
+  connect_timeout: 5
+  base_url: "http://localhost:8082"
+  endpoint:
+    get_order_by_id: "/orders/:id"
