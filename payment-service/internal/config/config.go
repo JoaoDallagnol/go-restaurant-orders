@@ -26,7 +26,7 @@ type Config struct {
 		ConnectTimeout int    `mapstructure:"connect_timeout"`
 		BaseURL        string `mapstructure:"base_url"`
 		Endpoint       struct {
-			GetDishByID string `mapstructure:"get_order_by_id"`
+			GetOrderByID string `mapstructure:"get_order_by_id"`
 		} `mapstructure:"endpoint"`
 	} `mapstructure:"order_service"`
 }

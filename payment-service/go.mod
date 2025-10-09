@@ -21,6 +21,7 @@ require (
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.21.0
 	golang.org/x/text v0.28.0 // indirect
 )
