@@ -1,8 +1,13 @@
 package service
 
 import (
+	"errors"
+
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/errs"
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/repository"
+	"gorm.io/gorm"
 )
 
 type PaymentService interface {
@@ -23,11 +28,23 @@ func NewPaymentService(paymentRepository repository.PaymentRepository) PaymentSe
 }
 
 func (p *paymentService) GetAllPayments() ([]model.PaymentResponse, error) {
-	panic("unimplemented")
+	paymentList, err := p.paymentRepository.GetAllPayments()
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.MapPaymentListToPaymentResponseList(&paymentList), nil
 }
 
 func (p *paymentService) GetPaymentById(id uint) (model.PaymentResponse, error) {
-	panic("unimplemented")
+	payment, err := p.paymentRepository.GetPaymentById(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.PaymentResponse{}, errs.NewPaymentNotFound(id)
+		}
+		return model.PaymentResponse{}, errs.NewInternalError(err.Error())
+	}
+	return mapper.MapPaymentToPaymentResponse(payment), nil
 }
 
 func (p *paymentService) CreatePayment(payment *model.PaymentRequest) (model.PaymentResponse, error) {
@@ -35,5 +52,18 @@ func (p *paymentService) CreatePayment(payment *model.PaymentRequest) (model.Pay
 }
 
 func (p *paymentService) DeletePayment(id uint) error {
-	panic("unimplemented")
+	payment, err := p.paymentRepository.GetPaymentById(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errs.NewPaymentNotFound(id)
+		}
+		return errs.NewInternalError(err.Error())
+	}
+
+	err = p.paymentRepository.DeletePayment(payment)
+	if err != nil {
+		return errs.NewInternalError(err.Error())
+	}
+
+	return nil
 }

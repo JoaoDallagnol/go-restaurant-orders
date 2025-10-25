@@ -165,7 +165,6 @@ func (o *orderService) UpdateOrder(id uint, order *model.OrderRequest) (model.Or
 }
 
 func (o *orderService) DeleteOrder(id uint) error {
-
 	_, err := o.orderRepository.GetOrderByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
