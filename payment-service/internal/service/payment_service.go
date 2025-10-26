@@ -3,10 +3,13 @@ package service
 import (
 	"errors"
 
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/client"
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/constants"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/model"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/repository"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -19,11 +22,16 @@ type PaymentService interface {
 
 type paymentService struct {
 	paymentRepository repository.PaymentRepository
+	orderClient       client.OrderClient
 }
 
-func NewPaymentService(paymentRepository repository.PaymentRepository) PaymentService {
+func NewPaymentService(
+	paymentRepository repository.PaymentRepository,
+	orderClient client.OrderClient,
+) PaymentService {
 	return &paymentService{
 		paymentRepository: paymentRepository,
+		orderClient:       orderClient,
 	}
 }
 
@@ -47,8 +55,31 @@ func (p *paymentService) GetPaymentById(id uint) (model.PaymentResponse, error) 
 	return mapper.MapPaymentToPaymentResponse(payment), nil
 }
 
-func (p *paymentService) CreatePayment(payment *model.PaymentRequest) (model.PaymentResponse, error) {
-	panic("unimplemented")
+func (p *paymentService) CreatePayment(paymentReq *model.PaymentRequest) (model.PaymentResponse, error) {
+	order, err := p.orderClient.GetOrderById(paymentReq.OrderId)
+	if err != nil {
+		return model.PaymentResponse{}, errs.NewOrderServiceIntegrationError()
+	}
+
+	var status constants.PaymentStatus
+	amountDecimal, err := decimal.NewFromString(paymentReq.Amount)
+	if err != nil {
+		status = constants.CANCELLED
+	} else {
+		if order.Total.GreaterThan(amountDecimal) {
+			status = constants.DECLINED
+		} else {
+			status = constants.APPROVED
+		}
+	}
+
+	payment := mapper.MapPaymentRequestToPayment(paymentReq, status)
+	createdPayment, err := p.paymentRepository.CreatePayment(&payment)
+	if err != nil {
+		return model.PaymentResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	return mapper.MapPaymentToPaymentResponse(createdPayment), nil
 }
 
 func (p *paymentService) DeletePayment(id uint) error {

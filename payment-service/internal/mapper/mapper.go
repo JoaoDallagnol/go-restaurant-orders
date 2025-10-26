@@ -1,6 +1,9 @@
 package mapper
 
-import "github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/model"
+import (
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/constants"
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/model"
+)
 
 func MapPaymentToPaymentResponse(payment *model.Payment) model.PaymentResponse {
 	return model.PaymentResponse{
@@ -20,4 +23,12 @@ func MapPaymentListToPaymentResponseList(paymentList *[]model.Payment) []model.P
 	}
 
 	return paymentResponseList
+}
+
+func MapPaymentRequestToPayment(payment *model.PaymentRequest, status constants.PaymentStatus) model.Payment {
+	return model.Payment{
+		OrderID: payment.OrderId,
+		Amount:  payment.Amount,
+		Status:  status,
+	}
 }
