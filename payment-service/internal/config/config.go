@@ -22,6 +22,12 @@ type Config struct {
 		SSLMode  string `mapstructure:"sslmode"`
 	} `mapstructure:"database"`
 
+	RabbitMQ struct {
+		Url          string `mapstructure:"url"`
+		ExchangeName string `mapstructure:"exchange_name"`
+		RoutingKey   string `mapstructure:"routing_key"`
+	} `mapstructure:"rabbitmq"`
+
 	OrderService struct {
 		ConnectTimeout int    `mapstructure:"connect_timeout"`
 		BaseURL        string `mapstructure:"base_url"`
