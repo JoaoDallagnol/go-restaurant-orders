@@ -24,7 +24,7 @@ type Config struct {
 
 	RabbitMQ struct {
 		Url          string `mapstructure:"url"`
-		ExchangeName string `mapstructure:"exchange_name"`
+		ExchangeName string `mapstructure:"exchange"`
 		RoutingKey   string `mapstructure:"routing_key"`
 	} `mapstructure:"rabbitmq"`
 
