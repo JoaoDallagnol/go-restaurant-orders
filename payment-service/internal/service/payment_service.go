@@ -2,12 +2,14 @@ package service
 
 import (
 	"errors"
+	"log"
 
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/client"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/constants"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/errs"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/mapper"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/model"
+	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/publishers"
 	"github.com/JoaoDallagnol/go-restaurant-orders/payment-service/internal/repository"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
@@ -23,15 +25,18 @@ type PaymentService interface {
 type paymentService struct {
 	paymentRepository repository.PaymentRepository
 	orderClient       client.OrderClient
+	publisher         *publishers.OrderServicePublisher
 }
 
 func NewPaymentService(
 	paymentRepository repository.PaymentRepository,
 	orderClient client.OrderClient,
+	publisher *publishers.OrderServicePublisher,
 ) PaymentService {
 	return &paymentService{
 		paymentRepository: paymentRepository,
 		orderClient:       orderClient,
+		publisher:         publisher,
 	}
 }
 
@@ -77,6 +82,20 @@ func (p *paymentService) CreatePayment(paymentReq *model.PaymentRequest) (model.
 	createdPayment, err := p.paymentRepository.CreatePayment(&payment)
 	if err != nil {
 		return model.PaymentResponse{}, errs.NewInternalError(err.Error())
+	}
+
+	var orderStatus constants.OrderStatus
+	switch status {
+	case constants.APPROVED:
+		orderStatus = constants.StatusConfirmed
+	case constants.CANCELLED, constants.DECLINED:
+		orderStatus = constants.StatusCancelled
+	default:
+		orderStatus = constants.StatusPending
+	}
+
+	if err := p.publisher.Publish(paymentReq.OrderId, orderStatus); err != nil {
+		log.Printf("⚠️ Failed to publish order status update: %v", err)
 	}
 
 	return mapper.MapPaymentToPaymentResponse(createdPayment), nil
