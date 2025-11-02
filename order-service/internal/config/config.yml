@@ -9,6 +9,11 @@ database:
   dbname: "postgres"
   schema: "go_restaurant_orders_order_service"
   sslmode: "disable"
+rabbitmq:
+  url: "amqp://admin:admin123@localhost:5672/"
+  exchange: "order_status_exchange"
+  queue: "order_status_queue"
+  routing_key: "order.status"
 menu_service:
   connect_timeout: 5
   base_url: "http://localhost:8081"
