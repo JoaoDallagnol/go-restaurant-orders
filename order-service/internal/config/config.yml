@@ -11,9 +11,9 @@ database:
   sslmode: "disable"
 rabbitmq:
   url: "amqp://admin:admin123@localhost:5672/"
-  exchange: "order_status_exchange"
+  exchange: "order.events"
   queue: "order_status_queue"
-  routing_key: "order.status"
+  routing_key: "order.status.updated"
 menu_service:
   connect_timeout: 5
   base_url: "http://localhost:8081"
