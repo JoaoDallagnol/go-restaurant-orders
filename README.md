@@ -81,7 +81,37 @@ The system is composed of the following microservices:
     - **GORM** – ORM for database interaction  
       - `gorm.io/gorm`  
       - `gorm.io/driver/postgres`  
+    - **RabbitMQ** – Asynchronous message broker for order status updates  
+      - `github.com/rabbitmq/amqp091-go`  
     - **Swagger / OpenAPI 3.0** – API documentation and client generation  
     - **Viper** – Configuration management  
     - **Go Modules** – Dependency management  
     - **shopspring/decimal** – High-precision decimal for monetary values  
+
+### Payment Service
+  The `payment-service` is responsible for processing payments related to customer orders.  
+  It validates order amounts, updates payment statuses (such as APPROVED, DECLINED, or CANCELLED), and communicates payment results asynchronously to the `order-service` via **RabbitMQ**.
+
+  - 📚 **API Endpoints** (following **OpenAPI 3.0.3**):
+    - **Payments**
+      - `GET /payments` – Retrieve all payments  
+      - `POST /payments` – Create a new payment and trigger status message publishing  
+      - `GET /payments/{id}` – Retrieve a payment by ID  
+      - `DELETE /payments/{id}` – Delete a payment by ID  
+
+  - 🛠️ **Technologies Used**:
+    - **Go 1.24.6** – Core programming language  
+    - **Gin** – Lightweight HTTP web framework  
+    - **GORM** – ORM for database interaction  
+      - `gorm.io/gorm`  
+      - `gorm.io/driver/postgres`  
+    - **RabbitMQ** – Message broker for publishing order status updates  
+      - `github.com/rabbitmq/amqp091-go`  
+    - **Swagger / OpenAPI 3.0** – API documentation and client generation  
+    - **Viper** – Configuration management  
+    - **shopspring/decimal** – High-precision decimal for payment amounts  
+    - **Go Modules** – Dependency management  
+
+  - ⚙️ **Message Flow**
+    - When a payment is created, its status (`APPROVED`, `DECLINED`, or `CANCELLED`) is published to RabbitMQ.
+    - The `order-service` consumes this message and updates the corresponding order status in its database.
